@@ -1,9 +1,12 @@
 {
-  "buildCommand": "cd ../.. && bun run build --filter=frontend",
+  "buildCommand": "npm install --no-scripts && npm run build",
   "outputDirectory": ".next",
   "framework": "nextjs",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
   "regions": ["iad1"],
+  "env": {
+    "NEXT_PUBLIC_DEMO_MODE": "true",
+    "NEXT_PUBLIC_BACKEND_URL": "/api"
+  },
   "rewrites": [
     { 
       "source": "/api/v1/website", 
