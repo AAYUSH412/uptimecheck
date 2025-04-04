@@ -1,0 +1,25 @@
+{
+  "buildCommand": "cd ../.. && bun run build --filter=frontend",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
+  "regions": ["iad1"],
+  "rewrites": [
+    { 
+      "source": "/api/v1/website", 
+      "destination": "/api/mock-website" 
+    },
+    { 
+      "source": "/api/v1/website/:id", 
+      "destination": "/api/mock-website/:id" 
+    },
+    {
+      "source": "/api/v1/auth/status",
+      "destination": "/api/mock-auth"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    }
+  ]
+}

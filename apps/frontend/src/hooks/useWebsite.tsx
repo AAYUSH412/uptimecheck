@@ -168,12 +168,6 @@ export function useWebsite() {
 
   const refreshWebsites = useCallback(async () => {
     // Don't attempt to fetch if user is not signed in
-    if (!isSignedIn) {
-      setAuthError("You must be signed in to monitor websites");
-      setWebsites([]);
-      setIsLoading(false);
-      return;
-    }
     
     setIsLoading(true);
     setError(null);
