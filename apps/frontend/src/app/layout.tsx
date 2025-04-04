@@ -10,6 +10,14 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "UptimeCheck - Website Monitoring",
   description: "Monitor your website's uptime and performance",
+  icons: {
+    icon: [
+      { url: '/square-activity.svg', type: 'image/svg+xml' }
+    ],
+    apple: [
+      { url: '/square-activity.svg', type: 'image/svg+xml' }
+    ]
+  }
 };
 
 export default function RootLayout({
@@ -19,21 +27,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <title>UptimeGuard - 24/7 Monitoring for Your Services</title>
-        <meta
-          name="description"
-          content="Monitor your websites, APIs, and services with UptimeGuard. Get instant alerts when issues arise."
-        />
-      </head>
       <body className={inter.className}>
         <ThemeProvider defaultTheme="dark" forcedTheme="dark">
-          <ClerkProvider
-          appearance={{
-            elements: {
-              formButtonPrimary: 'bg-black-500 hover:bg-slate-400 text-sm',
-            },
-          }}>
+          <ClerkProvider>
             <Appbar />
             {children}
           </ClerkProvider>

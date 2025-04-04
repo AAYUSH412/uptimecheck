@@ -69,9 +69,11 @@ export function AddWebsiteDialog({ onWebsiteAdded }: AddWebsiteDialogProps) {
         // Reset form
         setWebsiteName("");
         setWebsiteUrl("");
+        // router.refresh();
         
         // Close the dialog by setting the open state to false
         setOpen(false);
+        window.location.reload();
     } catch (err) {
       console.error("Error adding website:", err);
       setError("Failed to add website. Please try again.");

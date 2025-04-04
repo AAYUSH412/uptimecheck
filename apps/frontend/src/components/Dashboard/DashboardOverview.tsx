@@ -1,31 +1,57 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { CheckCircle, Clock, ExternalLink, Globe, Plus, RefreshCw, Search, XCircle } from "lucide-react"
+import { CheckCircle, Clock, ExternalLink, Globe, Plus, RefreshCw, Search, XCircle, Trash2, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Website } from "./mockData"
 import { AddWebsiteDialog } from "./AddWebsiteDialog"
+import { useAuth } from "@clerk/nextjs"
+import axios from "axios"
+import { BACKEND_URL } from "../../../config"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface DashboardOverviewProps {
   websites: Website[]
   onSelectWebsite: (website: Website) => void
   onAddWebsite?: (website: Website) => void
+  isLoading?: boolean
+  onRefresh?: () => void
 }
 
 export function DashboardOverview({ 
   websites, 
   onSelectWebsite, 
-  onAddWebsite 
+  onAddWebsite,
+  isLoading,
+  onRefresh 
 }: DashboardOverviewProps) {
   const totalWebsites = websites.length
   const websitesUp = websites.filter((w) => w.status === "up").length
   const websitesDown = totalWebsites - websitesUp
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [searchInput, setSearchInput] = useState("")
+  const { getToken } = useAuth()
+  
+  // For deletion functionality
+  const [websiteToDelete, setWebsiteToDelete] = useState<Website | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const handleRefresh = () => {
     setIsRefreshing(true)
+    if (onRefresh) {
+      onRefresh()
+    }
     setTimeout(() => setIsRefreshing(false), 1000)
   }
 
@@ -34,6 +60,33 @@ export function DashboardOverview({
       onAddWebsite(website);
     }
   }
+  
+  const handleDeleteWebsite = async () => {
+    if (!websiteToDelete) return;
+    
+    setIsDeleting(true);
+    setDeleteError(null);
+    
+    try {
+      const token = await getToken();
+      await axios.delete(`${BACKEND_URL}/api/v1/website?websiteid=${websiteToDelete.id}`, {
+        headers: {
+          Authorization: token,
+        },
+      });
+      
+      // Close dialog and refresh data
+      setWebsiteToDelete(null);
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (err) {
+      console.error("Error deleting website:", err);
+      setDeleteError("Failed to delete website. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -168,9 +221,11 @@ export function DashboardOverview({
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.2, delay: index * 0.05 }}
                   whileHover={{ y: -2, boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)" }}
-                  onClick={() => onSelectWebsite(website)}
                 >
-                  <div className="flex items-center gap-4">
+                  <div 
+                    className="flex items-center gap-4 flex-1"
+                    onClick={() => onSelectWebsite(website)}
+                  >
                     <div 
                       className={`h-3 w-3 rounded-full ${
                         website.status === "up" 
@@ -183,13 +238,29 @@ export function DashboardOverview({
                       <p className="text-sm text-muted-foreground">{website.url}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
                     <div className="text-right">
                       <p className="text-sm font-medium">{website.uptime} uptime</p>
                       <p className="text-xs text-muted-foreground">Last checked {website.lastChecked}</p>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8"
+                      onClick={() => window.open(`${website.url}`, '_blank')}
+                    >
                       <ExternalLink className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setWebsiteToDelete(website);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </motion.div>
@@ -198,6 +269,38 @@ export function DashboardOverview({
           </div>
         </CardContent>
       </Card>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={!!websiteToDelete} onOpenChange={(open) => !open && setWebsiteToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this website?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete <strong>{websiteToDelete?.name}</strong> from your monitoring dashboard.
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {deleteError && (
+            <div className="flex items-center gap-2 rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+              <AlertCircle className="h-4 w-4" />
+              {deleteError}
+            </div>
+          )}
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDeleteWebsite();
+              }}
+              disabled={isDeleting}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isDeleting ? "Deleting..." : "Delete Website"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

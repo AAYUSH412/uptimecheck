@@ -37,8 +37,6 @@ export function Appbar() {
   // Navigation items for better organization
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
-    { name: "Websites", href: "/websites", icon: <Globe className="h-4 w-4" /> },
-    { name: "Reports", href: "/reports", icon: <BarChart className="h-4 w-4" /> },
   ];
 
   // Handle scroll effect - make navbar transparent or solid
@@ -80,17 +78,6 @@ export function Appbar() {
               </motion.div>
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-400">UptimeCheck</span>
             </Link>
-            
-            {/* Desktop Search Bar */}
-            <div className="hidden lg:block ml-6">
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search..."
-                  className="pl-8 w-[200px] bg-secondary/50 border-secondary focus-visible:bg-background"
-                />
-              </div>
-            </div>
           </div>
 
           {/* Desktop nav */}
@@ -114,11 +101,6 @@ export function Appbar() {
 
           {/* Right side - auth and other actions */}
           <div className="hidden md:flex items-center gap-2">
-            {/* Notifications */}
-            <Button variant="ghost" size="icon" className="rounded-full relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-0 right-0.5 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-background" />
-            </Button>
             
             {/* Auth buttons */}
             <SignedOut>

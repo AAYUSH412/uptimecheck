@@ -91,7 +91,5 @@ export const deleteWebsite = async (req: Request, res: Response) => {
             disabled:true
         }
     });
-    
-
     res.json({ message: "Website Deleted" });
 };

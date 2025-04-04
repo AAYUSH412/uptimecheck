@@ -8,6 +8,8 @@ import {
   Globe,
   XCircle,
   HelpCircle,
+  Trash2,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,10 +21,25 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Website } from "./mockData";
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import axios from "axios";
+import { BACKEND_URL } from "../../../config";
+import { useAuth } from "@clerk/nextjs";
 
 interface WebsiteDetailProps {
   website: Website;
   onBack: () => void;
+  onDelete?: (websiteId: string | number) => void;
 }
 
 // Function to get status styling
@@ -64,30 +81,107 @@ const StatusIndicator = ({ status }: { status: string }) => {
   }
 };
 
-export function WebsiteDetail({ website, onBack }: WebsiteDetailProps) {
+export function WebsiteDetail({ website, onBack, onDelete }: WebsiteDetailProps) {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const { getToken } = useAuth();
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    setDeleteError(null);
+
+    try {
+      const token = await getToken();
+      await axios.delete(`${BACKEND_URL}/api/v1/website?websiteid=${website.id}`, {
+        headers: {
+          Authorization: token,
+        },
+      });
+
+      // Close dialog and notify parent component
+      setIsDeleteDialogOpen(false);
+      if (onDelete) {
+        onDelete(website.id);
+      }
+      onBack();
+    } catch (err) {
+      console.error("Error deleting website:", err);
+      setDeleteError("Failed to delete website. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <motion.div
-        className="flex items-center gap-4"
+        className="flex items-center justify-between"
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={onBack}
-          className="flex-shrink-0"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <h1 className="text-3xl font-bold tracking-tight">{website.name}</h1>
-        <div
-          className={`flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium ${getStatusStyles(website.status)}`}
-        >
-          <StatusIndicator status={website.status} />
+        <div className="flex items-center gap-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onBack}
+            className="flex-shrink-0"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-3xl font-bold tracking-tight">{website.name}</h1>
+          <div
+            className={`flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-medium ${getStatusStyles(website.status)}`}
+          >
+            <StatusIndicator status={website.status} />
+          </div>
         </div>
+
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={() => setIsDeleteDialogOpen(true)}
+          className="gap-2"
+        >
+          <Trash2 className="h-4 w-4" />
+          Delete Website
+        </Button>
       </motion.div>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to delete this website?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete <strong>{website.name}</strong> from
+              your monitoring dashboard. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {deleteError && (
+            <div className="flex items-center gap-2 rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+              <AlertCircle className="h-4 w-4" />
+              {deleteError}
+            </div>
+          )}
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                handleDelete();
+              }}
+              disabled={isDeleting}
+              className="bg-destructive hover:bg-destructive"
+            >
+              {isDeleting ? "Deleting..." : "Delete Website"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <motion.div
@@ -102,8 +196,10 @@ export function WebsiteDetail({ website, onBack }: WebsiteDetailProps) {
               <Globe className="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-wrap">{website.url}</span>
+              <div className="flex-1 items-center gap-2">
+                <span className="text-sm font-medium text-pretty">
+                  {website.url}
+                </span>
                 <Button variant="ghost" size="icon" className="h-6 w-6">
                   <ExternalLink className="h-3.5 w-3.5" />
                 </Button>
@@ -145,7 +241,7 @@ export function WebsiteDetail({ website, onBack }: WebsiteDetailProps) {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{website.responseTime}</div>
-              <p className="text-xs text-muted-foreground">Average</p>
+              <p className="text-xs text-muted-foreground">Average Latency</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -158,9 +254,7 @@ export function WebsiteDetail({ website, onBack }: WebsiteDetailProps) {
           <Card className="overflow-hidden">
             <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-400 to-blue-600" />
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Last Checked
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Last Checked</CardTitle>
               <Clock className="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>

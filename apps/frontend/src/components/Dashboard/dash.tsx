@@ -11,12 +11,13 @@ import { WebsiteNavigation } from "./WebsiteNavigation"
 import { WebsiteSidebar } from "./WebsiteSidebar"
 import { Plus } from "lucide-react"
 import { useWebsite } from "@/hooks/useWebsite"
-import { Spinner } from "@/components/ui/spinner" 
+import { Spinner } from "@/components/ui/spinner"
+import { Toaster } from "@/components/ui/sonner" // Import toast if available, or add it
 
 export default function DashboardPage() {
   const [selectedWebsite, setSelectedWebsite] = useState<Website | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
-  const { websites, isLoading, error, refreshWebsites } = useWebsite()
+  const { websites, isLoading, error, refreshWebsites, authError } = useWebsite()
 
   const filteredWebsites = websites.filter(website => 
     website.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -29,6 +30,27 @@ export default function DashboardPage() {
     setTimeout(() => {
       refreshWebsites();
     }, 500);
+  }
+
+  const handleDeleteWebsite = (websiteId: string | number) => {
+    // Refresh the data after deletion
+    refreshWebsites();
+    // Show a notification
+    Toaster({
+      title: "Website deleted",
+      description: "The website has been removed from monitoring.",
+    });
+  }
+
+  if (authError) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{authError}</p>
+          <p className="mb-4">Please sign in to monitor websites.</p>
+        </div>
+      </div>
+    )
   }
 
   // if (isLoading && websites.length === 0) {
@@ -94,7 +116,11 @@ export default function DashboardPage() {
         {/* Main content */}
         <main className="flex-1 overflow-hidden">
           {selectedWebsite ? (
-            <WebsiteDetail website={selectedWebsite} onBack={() => setSelectedWebsite(null)} />
+            <WebsiteDetail 
+              website={selectedWebsite} 
+              onBack={() => setSelectedWebsite(null)} 
+              onDelete={handleDeleteWebsite}
+            />
           ) : (
             <DashboardOverview 
               websites={filteredWebsites} 

@@ -10,6 +10,7 @@ interface Tick {
   status: string;
   createdAt: string;
   updatedAt: string;
+  latency?: number; // Add latency property
 }
 
 interface ApiWebsite {
@@ -39,13 +40,15 @@ interface ProcessedWebsite {
   responseTime: string;
   lastChecked: string;
   uptimeHistory: AggregatedTick[];
+  latency?: number; // Optional property for latency
 }
 
 export function useWebsite() {
-  const { getToken } = useAuth();
+  const { getToken, userId, isSignedIn } = useAuth();
   const [websites, setWebsites] = useState<ProcessedWebsite[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const processWebsiteData = (data: ApiWebsite[]): ProcessedWebsite[] => {
     return data.map(website => {
@@ -59,6 +62,15 @@ export function useWebsite() {
       const sortedTicks = [...normalizedTicks].sort((a, b) => 
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       );
+      
+      // Calculate average latency from ticks with positive latency
+      const latencyValues = sortedTicks
+        .filter(tick => tick.latency !== undefined && tick.latency > 0)
+        .map(tick => tick.latency);
+      
+      const avgLatency = latencyValues.length > 0
+        ? latencyValues.reduce((sum, val) => sum + val, 0) / latencyValues.length
+        : 0;
       
       // Group ticks in 3-minute windows
       const aggregatedTicks: AggregatedTick[] = [];
@@ -138,6 +150,7 @@ export function useWebsite() {
       
       const lastTick = sortedTicks.length > 0 ? sortedTicks[sortedTicks.length - 1] : null;
       const currentStatus = lastTick ? lastTick.status as "up" | "down" | "unknown" : "unknown";
+      // Determine the current status based on the last tick 
       
       return {
         id: website.id,
@@ -145,19 +158,35 @@ export function useWebsite() {
         name: website.url.replace(/^https?:\/\/(www\.)?/, '').split('/')[0], // Extract domain name
         status: currentStatus,
         uptime: `${uptimePercentage}%`,
-        responseTime: "0ms", // This would need to be calculated if you have response time data
+        latency: avgLatency, // Use the calculated average latency
+        responseTime: avgLatency > 0 ? `${Math.round(avgLatency)}ms` : "0ms",
         lastChecked: lastTick ? new Date(lastTick.createdAt).toLocaleString() : "Never",
-        uptimeHistory: aggregatedTicks.slice(-10) // Keep the last 10 aggregated windows
+        uptimeHistory: aggregatedTicks.slice(-10), // Keep the last 10 aggregated windows
       };
     });
   };
 
   const refreshWebsites = useCallback(async () => {
+    // Don't attempt to fetch if user is not signed in
+    if (!isSignedIn) {
+      setAuthError("You must be signed in to monitor websites");
+      setWebsites([]);
+      setIsLoading(false);
+      return;
+    }
+    
     setIsLoading(true);
     setError(null);
+    setAuthError(null);
     
     try {
       const token = await getToken();
+      if (!token) {
+        setAuthError("Authentication required to access monitoring features");
+        setWebsites([]);
+        return;
+      }
+      
       const response = await axios.get(`${BACKEND_URL}/api/v1/website`, {
         headers: {
           Authorization: token,
@@ -166,28 +195,39 @@ export function useWebsite() {
       
       const processedData = processWebsiteData(response.data);
       setWebsites(processedData);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching websites:", err);
-      setError("Failed to fetch website data. Please try again.");
+      
+      // Specifically handle auth errors
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        setAuthError("Authentication failed. Please sign in again.");
+      } else {
+        setError("Failed to fetch website data. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [getToken]);
+  }, [getToken, isSignedIn]);
 
   useEffect(() => {
     refreshWebsites();
     
-    const interval = setInterval(() => {
-      refreshWebsites();
-    }, 60000); // 1 minute interval
-    
-    return () => clearInterval(interval);
-  }, [refreshWebsites]);
+    // Only set up polling if the user is signed in
+    if (isSignedIn) {
+      const interval = setInterval(() => {
+        refreshWebsites();
+      }, 60000); // 1 minute interval
+      
+      return () => clearInterval(interval);
+    }
+  }, [refreshWebsites, isSignedIn]);
 
   return {
     websites,
     isLoading,
     error,
+    authError, // New property for auth-specific errors
+    isAuthenticated: !!isSignedIn,
     refreshWebsites
   };
 }
