@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { CheckCircle, Clock, ExternalLink, Globe, Plus, RefreshCw, Search, XCircle, Trash2, AlertCircle } from "lucide-react"
+import { CheckCircle, Clock, ExternalLink, Globe, RefreshCw, Search, XCircle, Trash2, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -32,7 +32,6 @@ export function DashboardOverview({
   websites, 
   onSelectWebsite, 
   onAddWebsite,
-  isLoading,
   onRefresh 
 }: DashboardOverviewProps) {
   const totalWebsites = websites.length

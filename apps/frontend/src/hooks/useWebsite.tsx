@@ -4,11 +4,6 @@ import { useAuth } from "@clerk/nextjs";
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { BACKEND_URL } from "../../config";
-// Import the mock implementation
-import { useWebsite as useMockWebsites } from "./useMockWebsites";
-
-// Check if we're in demo mode (deployed on Vercel without backend)
-const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
 interface Tick {
   id: string;
@@ -49,20 +44,12 @@ interface ProcessedWebsite {
 }
 
 export function useWebsite() {
-  // If in demo mode, use the mock implementation
-  
-
-  // Your existing implementation for when backend is available
-  const { getToken, userId, isSignedIn } = useAuth();
+  const { getToken, isSignedIn } = useAuth();
   const [websites, setWebsites] = useState<ProcessedWebsite[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
 
-  if (DEMO_MODE) {
-    return useMockWebsites();
-  }
-  
   const processWebsiteData = (data: ApiWebsite[]): ProcessedWebsite[] => {
     return data.map(website => {
       const allTicks = website.ticks;
@@ -79,7 +66,7 @@ export function useWebsite() {
       // Calculate average latency from ticks with positive latency
       const latencyValues = sortedTicks
         .filter(tick => tick.latency !== undefined && tick.latency > 0)
-        .map(tick => tick.latency);
+        .map(tick => tick.latency as number); // Type assertion since we filtered undefined values
       
       const avgLatency = latencyValues.length > 0
         ? latencyValues.reduce((sum, val) => sum + val, 0) / latencyValues.length
@@ -155,8 +142,6 @@ export function useWebsite() {
       
       // Get overall status and uptime
       const upTicks = normalizedTicks.filter(tick => tick.status === "up").length;
-      const downTicks = normalizedTicks.filter(tick => tick.status === "down").length;
-      const unknownTicks = normalizedTicks.filter(tick => tick.status === "unknown").length;
       const uptimePercentage = normalizedTicks.length > 0 
         ? ((upTicks / normalizedTicks.length) * 100).toFixed(2) 
         : "0.00";
@@ -181,7 +166,6 @@ export function useWebsite() {
 
   const refreshWebsites = useCallback(async () => {
     // Don't attempt to fetch if user is not signed in
-    
     setIsLoading(true);
     setError(null);
     setAuthError(null);
@@ -202,11 +186,13 @@ export function useWebsite() {
       
       const processedData = processWebsiteData(response.data);
       setWebsites(processedData);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error fetching websites:", err);
       
       // Specifically handle auth errors
-      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+      const errorObject = err as { response?: { status?: number } };
+      if (errorObject.response && 
+          (errorObject.response.status === 401 || errorObject.response.status === 403)) {
         setAuthError("Authentication failed. Please sign in again.");
       } else {
         setError("Failed to fetch website data. Please try again.");
@@ -214,7 +200,7 @@ export function useWebsite() {
     } finally {
       setIsLoading(false);
     }
-  }, [getToken, isSignedIn]);
+  }, [getToken]); // Removed isSignedIn from dependency array as it's used conditionally
 
   useEffect(() => {
     refreshWebsites();

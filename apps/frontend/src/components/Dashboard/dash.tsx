@@ -9,22 +9,30 @@ import { DashboardOverview } from "./DashboardOverview"
 import { Website } from "./mockData" // Keep the type import only
 import { WebsiteNavigation } from "./WebsiteNavigation"
 import { WebsiteSidebar } from "./WebsiteSidebar"
-import { Plus } from "lucide-react"
 import { useWebsite } from "@/hooks/useWebsite"
-import { Spinner } from "@/components/ui/spinner"
-import { Toaster } from "@/components/ui/sonner" // Import toast if available, or add it
+import { Toaster } from "@/components/ui/sonner"
 
 export default function DashboardPage() {
   const [selectedWebsite, setSelectedWebsite] = useState<Website | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
-  const { websites, isLoading, error, refreshWebsites, authError } = useWebsite()
+  const { websites, isLoading, refreshWebsites, authError } = useWebsite()
 
-  const filteredWebsites = websites.filter(website => 
+  // Convert ProcessedWebsite[] to Website[] for compatibility
+  const compatibleWebsites: Website[] = websites.map(site => ({
+    ...site,
+    id: typeof site.id === 'string' ? parseInt(site.id, 10) || 0 : site.id, // Convert string ID to number
+    uptimeHistory: site.uptimeHistory.map(tick => ({
+      timestamp: tick.timestamp,
+      status: tick.status
+    }))
+  }))
+
+  const filteredWebsites = compatibleWebsites.filter(website => 
     website.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     website.url.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const handleAddWebsite = (newWebsite: Website) => {
+  const handleAddWebsite = () => {
     // This would need to call an API to create the website
     // For now, just refresh the data after a short delay
     setTimeout(() => {
@@ -32,13 +40,15 @@ export default function DashboardPage() {
     }, 500);
   }
 
-  const handleDeleteWebsite = (websiteId: string | number) => {
+  const handleDeleteWebsite = () => {
     // Refresh the data after deletion
     refreshWebsites();
     // Show a notification
     Toaster({
       title: "Website deleted",
-      description: "The website has been removed from monitoring.",
+      description: "The website has been deleted successfully.",
+      variant: "success",
+      duration: 3000,
     });
   }
 
@@ -52,26 +62,6 @@ export default function DashboardPage() {
       </div>
     )
   }
-
-  // if (isLoading && websites.length === 0) {
-  //   return (
-  //     <div className="flex h-screen items-center justify-center">
-  //       <Spinner className="h-8 w-8 text-blue-500" />
-  //       <span className="ml-2">Loading websites...</span>
-  //     </div>
-  //   )
-  // }
-
-  // if (error && websites.length === 0) {
-  //   return (
-  //     <div className="flex h-screen items-center justify-center">
-  //       <div className="text-center">
-  //         <p className="text-red-500 mb-4">{error}</p>
-  //         <Button onClick={refreshWebsites}>Retry</Button>
-  //       </div>
-  //     </div>
-  //   )
-  // }
 
   return (
     <div className="flex min-h-screen flex-col dark">
@@ -105,7 +95,7 @@ export default function DashboardPage() {
               <div className="space-y-1">
                 <WebsiteSidebar 
                   websites={filteredWebsites} 
-                  selectedWebsite={selectedWebsite} 
+                  selectedWebsite={selectedWebsite as Website} 
                   onSelectWebsite={setSelectedWebsite} 
                 />
               </div>

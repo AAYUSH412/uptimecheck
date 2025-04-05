@@ -54,7 +54,7 @@ export function AddWebsiteDialog({ onWebsiteAdded }: AddWebsiteDialogProps) {
 
     try {
       const token = await getToken();
-      const response = await axios.post(
+      const { data } = await axios.post(
         `${BACKEND_URL}/api/v1/website`,
         { url: websiteUrl },
         {
@@ -65,15 +65,24 @@ export function AddWebsiteDialog({ onWebsiteAdded }: AddWebsiteDialogProps) {
         }
       );
 
-
-        // Reset form
-        setWebsiteName("");
-        setWebsiteUrl("");
-        // router.refresh();
-        
-        // Close the dialog by setting the open state to false
-        setOpen(false);
-        window.location.reload();
+      // Reset form
+      setWebsiteName("");
+      setWebsiteUrl("");
+      
+      // Close the dialog by setting the open state to false
+      setOpen(false);
+      
+      // Call the onWebsiteAdded callback with the new website data
+      onWebsiteAdded({
+        id: data.id,
+        name: websiteName || websiteUrl.replace(/^https?:\/\/(www\.)?/, '').split('/')[0],
+        url: websiteUrl,
+        status: "unknown",
+        uptime: "0%",
+        responseTime: "0ms",
+        lastChecked: "Just now",
+        uptimeHistory: []
+      });
     } catch (err) {
       console.error("Error adding website:", err);
       setError("Failed to add website. Please try again.");
