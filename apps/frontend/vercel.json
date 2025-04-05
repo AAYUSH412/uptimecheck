@@ -1,28 +1,34 @@
 {
-  "buildCommand": "npm install --no-scripts && npm run build",
-  "outputDirectory": ".next",
   "framework": "nextjs",
-  "regions": ["iad1"],
-  "env": {
-    "NEXT_PUBLIC_DEMO_MODE": "true",
-    "NEXT_PUBLIC_BACKEND_URL": "/api"
-  },
-  "rewrites": [
-    { 
-      "source": "/api/v1/website", 
-      "destination": "/api/mock-website" 
-    },
-    { 
-      "source": "/api/v1/website/:id", 
-      "destination": "/api/mock-website/:id" 
-    },
+  "buildCommand": "npm run build --workspace=frontend",
+  "outputDirectory": ".next",
+  "cleanUrls": true,
+  "headers": [
     {
-      "source": "/api/v1/auth/status",
-      "destination": "/api/mock-auth"
-    },
-    {
-      "source": "/api/:path*",
-      "destination": "/api/:path*"
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
     }
-  ]
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ],
+  "env": {
+    "NEXT_PUBLIC_DEMO_MODE": "true"
+  }
 }

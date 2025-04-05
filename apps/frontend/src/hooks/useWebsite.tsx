@@ -4,6 +4,11 @@ import { useAuth } from "@clerk/nextjs";
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { BACKEND_URL } from "../../config";
+// Import the mock implementation
+import { useWebsite as useMockWebsites } from "./useMockWebsites";
+
+// Check if we're in demo mode (deployed on Vercel without backend)
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
 interface Tick {
   id: string;
@@ -44,12 +49,20 @@ interface ProcessedWebsite {
 }
 
 export function useWebsite() {
+  // If in demo mode, use the mock implementation
+  
+
+  // Your existing implementation for when backend is available
   const { getToken, userId, isSignedIn } = useAuth();
   const [websites, setWebsites] = useState<ProcessedWebsite[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
 
+  if (DEMO_MODE) {
+    return useMockWebsites();
+  }
+  
   const processWebsiteData = (data: ApiWebsite[]): ProcessedWebsite[] => {
     return data.map(website => {
       const allTicks = website.ticks;
