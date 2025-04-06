@@ -10,7 +10,6 @@ import { Website } from "./mockData" // Keep the type import only
 import { WebsiteNavigation } from "./WebsiteNavigation"
 import { WebsiteSidebar } from "./WebsiteSidebar"
 import { useWebsite } from "@/hooks/useWebsite"
-import { Toaster } from "@/components/ui/sonner"
 import { toast } from "sonner"
 
 export default function DashboardPage() {

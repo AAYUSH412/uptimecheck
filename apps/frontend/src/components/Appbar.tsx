@@ -14,11 +14,7 @@ import {
   ActivitySquare, 
   Menu, 
   X, 
-  ChevronDown, 
-  Home,
   LayoutDashboard,
-  Globe,
-  BarChart,
   Bell,
   Settings,
   Search
@@ -27,7 +23,6 @@ import { Button } from "./ui/button";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Input } from "./ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 export function Appbar() {
   const [isOpen, setIsOpen] = useState(false);
