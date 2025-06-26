@@ -1,10 +1,10 @@
 {
-  "buildCommand": "cd ../.. && npm install && npm run build --filter=frontend",
+  "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "installCommand": "npm install",
   "framework": "nextjs",
   "functions": {
-    "app/**": {
+    "app/**/*.js": {
       "maxDuration": 30
     }
   },
@@ -27,17 +27,32 @@
         {
           "key": "Referrer-Policy",
           "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains"
         }
       ]
     },
     {
-      "source": "/static/(.*)",
+      "source": "/_next/static/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
         }
       ]
+    },
+    {
+      "source": "/favicon.ico",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=86400"
+        }
+      ]
     }
-  ]
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false
 }
