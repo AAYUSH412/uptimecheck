@@ -10,9 +10,7 @@ const nextConfig: NextConfig = {
   // Enable compression and optimizations
   compress: true,
   poweredByHeader: false,
-  // Configure output for standalone deployment
-  output: 'standalone',
-  // Optimize bundle analysis
+  // Configure bundle analysis
   webpack: (config, { isServer }) => {
     // Optimize for client-side bundles
     if (!isServer) {
@@ -37,6 +35,10 @@ const nextConfig: NextConfig = {
       // Add API rewrites if needed for production
     ];
   },
+  // Add experimental features if needed
+  experimental: {
+    optimizePackageImports: ['framer-motion', 'lucide-react']
+  }
 };
 
 export default nextConfig;

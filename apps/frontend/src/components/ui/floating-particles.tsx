@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 
 interface Particle {
   x: number
@@ -18,8 +18,15 @@ export function FloatingParticles() {
   const particlesRef = useRef<Particle[]>([])
   const animationRef = useRef<number>(0)
   const mouseRef = useRef({ x: 0, y: 0, radius: 150 })
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isClient) return
+    
     const canvas = canvasRef.current
     const container = containerRef.current
     if (!canvas || !container) return
@@ -141,7 +148,15 @@ export function FloatingParticles() {
         cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [])
+  }, [isClient])
+
+  if (!isClient) {
+    return (
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-transparent" />
+      </div>
+    )
+  }
 
   return (
     <div ref={containerRef} className="absolute inset-0 overflow-hidden pointer-events-none">

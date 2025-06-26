@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 
 export function AnimatedGradientBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -8,8 +8,15 @@ export function AnimatedGradientBackground() {
   const gradientRef = useRef<CanvasGradient | null>(null)
   const animationRef = useRef<number>(0)
   const mouseRef = useRef({ x: 0, y: 0 })
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isClient) return
+    
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -109,7 +116,11 @@ export function AnimatedGradientBackground() {
       window.removeEventListener("mousemove", handleMouseMove)
       cancelAnimationFrame(animationRef.current)
     }
-  }, [])
+  }, [isClient])
+
+  if (!isClient) {
+    return <div className="fixed inset-0 w-full h-full -z-10 bg-gradient-to-br from-blue-500/10 via-transparent to-indigo-500/10" />
+  }
 
   return <canvas ref={canvasRef} className="fixed inset-0 w-full h-full -z-10 opacity-80" />
 }

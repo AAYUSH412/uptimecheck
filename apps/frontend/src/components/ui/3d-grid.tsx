@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 
 export function Grid3D() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -8,8 +8,15 @@ export function Grid3D() {
   const animationRef = useRef<number>(0)
   const pointsRef = useRef<{ x: number; y: number; z: number }[]>([])
   const angleRef = useRef(0)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isClient) return
+    
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -155,7 +162,11 @@ export function Grid3D() {
       window.removeEventListener("resize", resizeCanvas)
       cancelAnimationFrame(animationRef.current)
     }
-  }, [])
+  }, [isClient])
+
+  if (!isClient) {
+    return <div className="fixed inset-0 w-full h-full -z-20 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5" />
+  }
 
   return <canvas ref={canvasRef} className="fixed inset-0 w-full h-full -z-20 opacity-40" />
 }
