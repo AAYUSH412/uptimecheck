@@ -3,28 +3,30 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Zap } from "lucide-react";
+import { 
+  Zap, 
+  ArrowRight, 
+  Shield, 
+  Globe, 
+  Activity, 
+  CheckCircle,
+  Sparkles,
+  Play
+} from "lucide-react";
 import { SignUpButton } from "@clerk/nextjs";
-
 import { Button } from "@/components/ui/button";
-import { FloatingParticles } from "@/components/ui/floating-particles";
-import { Grid3D } from "@/components/ui/3d-grid";
-import { AnimatedGradientBackground } from "@/components/ui/animated-gradient-background";
 
 export default function Hero() {
-  // Add opacity state for the gradient at the bottom
-  const [opacity, setOpacity] = useState(0);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  // Update opacity based on scroll
+  // Track mouse position for interactive effects
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const newOpacity = Math.min(scrollY / 300, 1);
-      setOpacity(newOpacity);
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
   // Animation variants
@@ -33,148 +35,227 @@ export default function Hero() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.2,
+        staggerChildren: 0.2,
+        delayChildren: 0.3,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 30, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: { type: "spring", stiffness: 100 },
+      transition: { 
+        type: "spring", 
+        stiffness: 100,
+        damping: 15
+      },
     },
   };
 
-  const statVariants = {
-    hidden: { scale: 0.8, opacity: 0 },
-    visible: {
-      scale: 1,
-      opacity: 1,
-      transition: { type: "spring", stiffness: 120 },
-    },
+  const floatingVariants = {
+    float: {
+      y: [0, -10, 0],
+      transition: {
+        duration: 3,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
+    }
   };
+
+  const features = [
+    { icon: <Shield className="h-5 w-5" />, text: "99.9% Uptime SLA" },
+    { icon: <Globe className="h-5 w-5" />, text: "Global Monitoring" },
+    { icon: <Activity className="h-5 w-5" />, text: "Real-time Alerts" },
+  ];
 
   return (
-    <section className="relative flex items-center justify-center overflow-hidden py-24 md:py-32 lg:py-40 min-h-[90vh]">
-      {/* Background elements for hero section */}
-      <Grid3D />
-      <AnimatedGradientBackground />
-      <FloatingParticles />
+    <section className="min-h-screen w-full relative overflow-hidden">
+      {/* Aurora Dream Diagonal Flow Background */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          background: `
+            radial-gradient(ellipse 80% 60% at 5% 40%, rgba(175, 109, 255, 0.48), transparent 67%),
+            radial-gradient(ellipse 70% 60% at 45% 45%, rgba(255, 100, 180, 0.41), transparent 67%),
+            radial-gradient(ellipse 62% 52% at 83% 76%, rgba(255, 235, 170, 0.44), transparent 63%),
+            radial-gradient(ellipse 60% 48% at 75% 20%, rgba(120, 190, 255, 0.36), transparent 66%),
+            linear-gradient(45deg, #f7eaff 0%, #fde2ea 100%)
+          `,
+        }}
+      />
 
-      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Interactive gradient that follows mouse */}
+      <div
+        className="absolute inset-0 z-10 opacity-30 pointer-events-none"
+        style={{
+          background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(99, 102, 241, 0.15), transparent 40%)`,
+        }}
+      />
+
+      {/* Floating particles */}
+      <div className="absolute inset-0 z-10">
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute"
+            initial={{ 
+              x: Math.random() * window.innerWidth, 
+              y: Math.random() * window.innerHeight 
+            }}
+            animate={{
+              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+              y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
+            }}
+            transition={{
+              duration: 20 + Math.random() * 10,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          >
+            <div 
+              className="h-2 w-2 rounded-full bg-gradient-to-r from-purple-400 to-blue-400 opacity-60"
+              style={{
+                boxShadow: "0 0 20px rgba(147, 51, 234, 0.5)"
+              }}
+            />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Main content */}
+      <div className="relative z-20 flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
         <motion.div
-          className="flex flex-col items-center gap-6 text-center"
+          className="max-w-5xl mx-auto text-center"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          <motion.div variants={itemVariants} className="mb-2">
-            <Link
-              href="#"
-              className="inline-flex items-center rounded-full bg-blue-500/10 px-4 py-1.5 text-sm font-medium text-blue-500 ring-1 ring-inset ring-blue-500/20 backdrop-blur-md transition-all hover:bg-blue-500/15"
-            >
+          {/* Badge */}
+          <motion.div variants={itemVariants} className="mb-8">
+            <div className="inline-flex items-center rounded-full bg-white/10 backdrop-blur-md px-4 py-2 text-sm font-medium text-purple-700 ring-1 ring-white/20 shadow-lg">
+              <Sparkles className="h-4 w-4 mr-2 text-purple-500" />
               <span className="relative flex h-2 w-2 mr-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
               </span>
-              New: Real-time status pages now available
-            </Link>
+              New: Advanced Analytics Dashboard Available
+            </div>
           </motion.div>
 
+          {/* Main heading */}
           <motion.h1
             variants={itemVariants}
-            className="font-heading text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl max-w-4xl"
+            className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6"
           >
-            Monitor your services with{" "}
+            <span className="bg-gradient-to-r from-gray-900 via-purple-800 to-gray-900 bg-clip-text text-transparent">
+              Monitor with
+            </span>
+            <br />
             <span className="relative inline-block">
-              <span className="bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-600 bg-clip-text text-transparent">
-                confidence
+              <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+                Confidence
               </span>
-              <motion.span
-                className="absolute -bottom-1 left-0 h-1 w-full bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-600"
+              <motion.div
+                className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-full"
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
-                transition={{ duration: 0.7, delay: 1.2 }}
+                transition={{ duration: 1, delay: 1.5 }}
               />
             </span>
           </motion.h1>
 
+          {/* Subtitle */}
           <motion.p
             variants={itemVariants}
-            className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8"
+            className="text-xl md:text-2xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed"
           >
-            Know instantly when your services go down. UptimeCheck provides 24/7
-            monitoring, instant alerts, and detailed analytics for your websites
-            and APIs.
+            Professional website monitoring with real-time alerts, detailed analytics, 
+            and enterprise-grade reliability. Never miss downtime again.
           </motion.p>
 
+          {/* CTA Buttons */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-4 mt-4 w-full max-w-md mx-auto justify-center"
+            className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
           >
-            <Button
-              size="lg"
-              className="gap-1 bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 shadow-lg shadow-blue-500/20 w-full sm:w-auto"
-            >
-              <SignUpButton mode="modal">
-                <motion.div
-                  className="flex items-center justify-center w-full"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Start monitoring <Zap className="ml-2 h-4 w-4" />
-                </motion.div>
-              </SignUpButton>
-            </Button>
+            <SignUpButton mode="modal">
+              <Button
+                size="lg"
+                className="group bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-2xl shadow-purple-500/25 px-8 py-4 text-lg font-semibold rounded-2xl transition-all duration-300 hover:scale-105"
+              >
+                <span className="flex items-center">
+                  Start Monitoring Free
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </span>
+              </Button>
+            </SignUpButton>
+            
             <Button
               size="lg"
               variant="outline"
-              className="border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 backdrop-blur-md w-full sm:w-auto"
+              className="group border-2 border-purple-200 bg-white/50 backdrop-blur-md hover:bg-white/70 text-purple-700 px-8 py-4 text-lg font-semibold rounded-2xl transition-all duration-300 hover:scale-105"
               asChild
             >
-              <motion.a
-                href="/dashboard"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center"
-              >
-                View demo
-              </motion.a>
+              <Link href="#demo">
+                <Play className="mr-2 h-5 w-5" />
+                Watch Demo
+              </Link>
             </Button>
           </motion.div>
 
+          {/* Features grid */}
           <motion.div
-            variants={statVariants}
-            className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8"
+            variants={itemVariants}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16"
+          >
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                variants={floatingVariants}
+                animate="float"
+                transition={{ delay: index * 0.2 }}
+                className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              >
+                <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg">
+                  {feature.icon}
+                </div>
+                <span className="font-semibold text-gray-800">{feature.text}</span>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Stats */}
+          <motion.div
+            variants={itemVariants}
+            className="grid grid-cols-2 md:grid-cols-4 gap-8"
           >
             {[
-              "Trusted by 2,000+ companies",
-              "99.9% uptime guarantee",
-              "24/7 support",
-            ].map((text, i) => (
-              <div key={i} className="flex items-center justify-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
-                <span className="text-sm font-medium text-muted-foreground">
-                  {text}
-                </span>
-              </div>
+              { number: "10K+", label: "Websites Monitored" },
+              { number: "99.9%", label: "Uptime Accuracy" },
+              { number: "50+", label: "Global Locations" },
+              { number: "24/7", label: "Expert Support" },
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                className="text-center"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 400 }}
+              >
+                <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
+                  {stat.number}
+                </div>
+                <div className="text-gray-600 font-medium">{stat.label}</div>
+              </motion.div>
             ))}
           </motion.div>
         </motion.div>
       </div>
 
-      {/* Bottom gradient for visual separation */}
-      <motion.div
-        className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent"
-        style={{ opacity }}
-      />
-
-      {/* Additional abstract elements for visual flair */}
-      <div className="absolute -bottom-48 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full bg-blue-500/5 blur-3xl pointer-events-none" />
-      <div className="absolute -top-24 right-1/3 w-[400px] h-[400px] rounded-full bg-indigo-500/5 blur-3xl pointer-events-none" />
+      {/* Bottom fade effect */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent z-30" />
     </section>
   );
 }

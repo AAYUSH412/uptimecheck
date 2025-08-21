@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "composite": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "references": [
+    {
+      "path": "./apps/api"
+    },
+    {
+      "path": "./apps/frontend"
+    },
+    {
+      "path": "./apps/hub"
+    },
+    {
+      "path": "./apps/validator"
+    },
+    {
+      "path": "./packages/common"
+    },
+    {
+      "path": "./packages/db"
+    }
+  ],
+  "files": []
+}

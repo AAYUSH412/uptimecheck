@@ -2,16 +2,24 @@
   "name": "validator",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "dev": "bun run --watch index.ts",
+    "start": "bun run index.ts",
+    "build": "bun build index.ts --outdir dist --target bun",
+    "lint": "eslint .",
+    "check-types": "tsc --noEmit"
+  },
   "devDependencies": {
     "@types/bun": "latest",
-    "common": "*"
+    "@types/node": "^22.11.1"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@solana/kit": "^2.1.0",
-    "@solana/web3.js": "^1.98.0",
+    "common": "workspace:*",
+    "@solana/web3.js": "^1.95.7",
+    "axios": "^1.8.4",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1"
   }

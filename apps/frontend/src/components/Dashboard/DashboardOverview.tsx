@@ -1,11 +1,14 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { CheckCircle, Clock, ExternalLink, Globe, RefreshCw, Search, XCircle, Trash2, AlertCircle } from "lucide-react"
+import { CheckCircle, Clock, ExternalLink, Globe, RefreshCw, Search, XCircle, Trash2, AlertCircle, Plus, TrendingUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 import { Website } from "./mockData"
 import { AddWebsiteDialog } from "./AddWebsiteDialog"
+import { DashboardSkeleton } from "./DashboardSkeleton"
+import { EmptyState } from "./EmptyState"
 import { useAuth } from "@clerk/nextjs"
 import axios from "axios"
 import { BACKEND_URL } from "../../../config"
@@ -32,7 +35,8 @@ export function DashboardOverview({
   websites, 
   onSelectWebsite, 
   onAddWebsite,
-  onRefresh 
+  onRefresh,
+  isLoading = false
 }: DashboardOverviewProps) {
   const totalWebsites = websites.length
   const websitesUp = websites.filter((w) => w.status === "up").length
@@ -45,6 +49,11 @@ export function DashboardOverview({
   const [websiteToDelete, setWebsiteToDelete] = useState<Website | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+
+  // Show loading skeleton
+  if (isLoading) {
+    return <DashboardSkeleton />
+  }
 
   const handleRefresh = () => {
     setIsRefreshing(true)
@@ -88,87 +97,130 @@ export function DashboardOverview({
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
-            <RefreshCw className={`h-4 w-4 mr-1 ${isRefreshing ? "animate-spin" : ""}`} />
+    <div className="space-y-8">
+      {/* Header Section */}
+      <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+        <div>
+          <motion.h1 
+            className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            Dashboard
+          </motion.h1>
+          <motion.p 
+            className="text-muted-foreground mt-2"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            Monitor and manage your website uptime in real-time
+          </motion.p>
+        </div>
+        <motion.div 
+          className="flex items-center space-x-3"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleRefresh} 
+            disabled={isRefreshing}
+            className="transition-all duration-200 hover:scale-105"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
             Refresh
           </Button>
           <AddWebsiteDialog onWebsiteAdded={handleWebsiteAdded} />
-        </div>
+        </motion.div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* Stats Cards */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <Card className="overflow-hidden">
-            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 to-blue-700" />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Websites</CardTitle>
-              <Globe className="h-4 w-4 text-blue-500" />
+          <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/50 hover:shadow-lg transition-all duration-300 hover:scale-105">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-blue-600/10" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+              <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Websites</CardTitle>
+              <div className="p-2 bg-blue-500/20 rounded-full">
+                <Globe className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{totalWebsites}</div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-        >
-          <Card className="overflow-hidden">
-            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-green-500 to-green-700" />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Websites Up</CardTitle>
-              <CheckCircle className="h-4 w-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{websitesUp}</div>
-              <p className="text-xs text-muted-foreground">{Math.round((websitesUp / totalWebsites) * 100)}% of total</p>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-        >
-          <Card className="overflow-hidden">
-            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-red-500 to-red-700" />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Websites Down</CardTitle>
-              <XCircle className="h-4 w-4 text-red-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{websitesDown}</div>
-              <p className="text-xs text-muted-foreground">
-                {Math.round((websitesDown / totalWebsites) * 100)}% of total
+            <CardContent className="relative z-10">
+              <div className="text-3xl font-bold text-blue-900 dark:text-blue-100">{totalWebsites}</div>
+              <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                {totalWebsites === 1 ? 'website' : 'websites'} monitored
               </p>
             </CardContent>
           </Card>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card className="overflow-hidden">
-            <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-amber-500 to-amber-700" />
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg. Response Time</CardTitle>
-              <Clock className="h-4 w-4 text-amber-500" />
+          <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/50 dark:to-green-900/50 hover:shadow-lg transition-all duration-300 hover:scale-105">
+            <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-green-600/10" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+              <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Websites Up</CardTitle>
+              <div className="p-2 bg-green-500/20 rounded-full">
+                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
+            <CardContent className="relative z-10">
+              <div className="text-3xl font-bold text-green-900 dark:text-green-100">{websitesUp}</div>
+              <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                {totalWebsites > 0 ? Math.round((websitesUp / totalWebsites) * 100) : 0}% uptime
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-950/50 dark:to-red-900/50 hover:shadow-lg transition-all duration-300 hover:scale-105">
+            <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-red-600/10" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+              <CardTitle className="text-sm font-medium text-red-700 dark:text-red-300">Websites Down</CardTitle>
+              <div className="p-2 bg-red-500/20 rounded-full">
+                <XCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+              </div>
+            </CardHeader>
+            <CardContent className="relative z-10">
+              <div className="text-3xl font-bold text-red-900 dark:text-red-100">{websitesDown}</div>
+              <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                {totalWebsites > 0 ? Math.round((websitesDown / totalWebsites) * 100) : 0}% offline
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <Card className="relative overflow-hidden border-0 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950/50 dark:to-amber-900/50 hover:shadow-lg transition-all duration-300 hover:scale-105">
+            <div className="absolute inset-0 bg-gradient-to-r from-amber-500/10 to-amber-600/10" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+              <CardTitle className="text-sm font-medium text-amber-700 dark:text-amber-300">Avg. Response</CardTitle>
+              <div className="p-2 bg-amber-500/20 rounded-full">
+                <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+              </div>
+            </CardHeader>
+            <CardContent className="relative z-10">
+              <div className="text-3xl font-bold text-amber-900 dark:text-amber-100">
                 {totalWebsites > 0 
                   ? Math.round(
                       websites.reduce((acc, website) => {
@@ -176,98 +228,153 @@ export function DashboardOverview({
                       }, 0) / totalWebsites,
                     ) 
                   : 0}
-                ms
+                <span className="text-lg ml-1">ms</span>
               </div>
+              <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                average response time
+              </p>
             </CardContent>
           </Card>
         </motion.div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>Monitored Websites</CardTitle>
-              <CardDescription>Overview of all your monitored websites and their current status.</CardDescription>
-            </div>
-            <div className="relative w-56">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Filter websites..."
-                className="w-full pl-8 text-sm"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-              />
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4">
-            {websites.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-10 text-center">
-                <Globe className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium">No websites found</h3>
-                <p className="text-sm text-muted-foreground mt-1 mb-6">Add your first website to start monitoring</p>
-                <AddWebsiteDialog onWebsiteAdded={handleWebsiteAdded} />
+      {/* Websites List */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
+        <Card className="border-0 shadow-lg bg-card/50 backdrop-blur-sm">
+          <CardHeader className="pb-4">
+            <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
+              <div>
+                <CardTitle className="text-xl font-semibold">Monitored Websites</CardTitle>
+                <CardDescription className="text-sm text-muted-foreground mt-1">
+                  Overview of all your monitored websites and their current status
+                </CardDescription>
               </div>
+              <div className="flex items-center space-x-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Filter websites..."
+                    className="w-64 pl-10 bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-200"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                </div>
+                <Badge variant="secondary" className="text-xs px-2 py-1">
+                  {websites.length} total
+                </Badge>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {websites.length === 0 ? (
+              <EmptyState onWebsiteAdded={handleWebsiteAdded} />
             ) : (
-              websites.map((website, index) => (
-                <motion.div
-                  key={website.id}
-                  className="flex items-center justify-between rounded-lg border p-4 cursor-pointer bg-card hover:bg-card/80 transition-colors"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2, delay: index * 0.05 }}
-                  whileHover={{ y: -2, boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)" }}
-                >
-                  <div 
-                    className="flex items-center gap-4 flex-1"
-                    onClick={() => onSelectWebsite(website)}
+              <div className="grid gap-4">
+                {websites.map((website, index) => (
+                  <motion.div
+                    key={website.id}
+                    className="group relative rounded-xl border bg-card/30 p-6 cursor-pointer transition-all duration-200 hover:shadow-md hover:bg-card/60"
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    animate={{ 
+                      opacity: 1, 
+                      y: 0, 
+                      scale: 1,
+                      transition: {
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 25,
+                        delay: index * 0.1
+                      }
+                    }}
+                    whileHover={{ 
+                      scale: 1.02,
+                      y: -4,
+                      transition: {
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 20
+                      }
+                    }}
+                    whileTap={{ scale: 0.98 }}
                   >
                     <div 
-                      className={`h-3 w-3 rounded-full ${
-                        website.status === "up" 
-                          ? "bg-green-500 animate-pulse" 
-                          : "bg-red-500"
-                      }`} 
-                    />
-                    <div>
-                      <p className="font-medium">{website.name}</p>
-                      <p className="text-sm text-muted-foreground">{website.url}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="text-right">
-                      <p className="text-sm font-medium">{website.uptime} uptime</p>
-                      <p className="text-xs text-muted-foreground">Last checked {website.lastChecked}</p>
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8"
-                      onClick={() => window.open(`${website.url}`, '_blank')}
+                      className="flex items-center justify-between"
+                      onClick={() => onSelectWebsite(website)}
                     >
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setWebsiteToDelete(website);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </motion.div>
-              ))
+                      <div className="flex items-center space-x-4 flex-1">
+                        <div className="relative">
+                          <div 
+                            className={`h-4 w-4 rounded-full ${
+                              website.status === "up" 
+                                ? "bg-green-500 shadow-lg shadow-green-500/50" 
+                                : "bg-red-500 shadow-lg shadow-red-500/50"
+                            }`} 
+                          />
+                          {website.status === "up" && (
+                            <div className="absolute inset-0 h-4 w-4 rounded-full bg-green-500 animate-ping opacity-20" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-3 mb-1">
+                            <p className="font-semibold text-lg truncate">{website.name}</p>
+                            <Badge 
+                              variant={website.status === "up" ? "default" : "destructive"}
+                              className="text-xs"
+                            >
+                              {website.status.toUpperCase()}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground truncate">{website.url}</p>
+                          <div className="flex items-center space-x-4 mt-2 text-xs text-muted-foreground">
+                            <span className="flex items-center space-x-1">
+                              <TrendingUp className="h-3 w-3" />
+                              <span>{website.uptime} uptime</span>
+                            </span>
+                            <span className="flex items-center space-x-1">
+                              <Clock className="h-3 w-3" />
+                              <span>{website.responseTime}ms</span>
+                            </span>
+                            <span>Last checked {website.lastChecked}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-9 w-9 hover:bg-primary/10"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(`${website.url}`, '_blank');
+                          }}
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setWebsiteToDelete(website);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             )}
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Delete confirmation dialog */}
       <AlertDialog open={!!websiteToDelete} onOpenChange={(open) => !open && setWebsiteToDelete(null)}>

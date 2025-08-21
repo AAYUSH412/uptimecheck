@@ -1,12 +1,19 @@
 {
   "name": "common",
+  "version": "0.0.1",
   "module": "index.ts",
   "type": "module",
   "exports": {
     "./types": "./index.ts"
   },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint .",
+    "check-types": "tsc --noEmit"
+  },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "typescript": "^5.8.2"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

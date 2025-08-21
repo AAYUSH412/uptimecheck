@@ -15,9 +15,12 @@ import {
   Menu, 
   X, 
   LayoutDashboard,
-  Bell,
-  Settings,
-  Search
+  Search,
+  Github,
+  Linkedin,
+  ExternalLink,
+  Star,
+  Code
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { usePathname } from "next/navigation";
@@ -32,6 +35,30 @@ export function Appbar() {
   // Navigation items for better organization
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
+    { name: "Features", href: "#features", icon: <Star className="h-4 w-4" /> },
+    { name: "About", href: "#about", icon: <Code className="h-4 w-4" /> },
+  ];
+
+  // Social links
+  const socialLinks = [
+    { 
+      name: "GitHub", 
+      href: "https://github.com/AAYUSH412", 
+      icon: <Github className="h-4 w-4" />,
+      color: "hover:text-gray-300"
+    },
+    { 
+      name: "LinkedIn", 
+      href: "https://www.linkedin.com/in/aayush-vaghela/", 
+      icon: <Linkedin className="h-4 w-4" />,
+      color: "hover:text-blue-400"
+    },
+    { 
+      name: "Portfolio", 
+      href: "https://aayush-vaghela.vercel.app/", 
+      icon: <ExternalLink className="h-4 w-4" />,
+      color: "hover:text-purple-400"
+    },
   ];
 
   // Handle scroll effect - make navbar transparent or solid
@@ -94,8 +121,29 @@ export function Appbar() {
             ))}
           </div>
 
-          {/* Right side - auth and other actions */}
-          <div className="hidden md:flex items-center gap-2">
+          {/* Right side - social links and auth */}
+          <div className="hidden md:flex items-center gap-3">
+            {/* Social Links */}
+            <div className="flex items-center gap-2 mr-2">
+              {socialLinks.map((link) => (
+                <motion.a
+                  key={link.name}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    "p-2 rounded-full text-muted-foreground transition-all duration-200",
+                    "hover:bg-secondary/60 hover:scale-110",
+                    link.color
+                  )}
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  title={link.name}
+                >
+                  {link.icon}
+                </motion.a>
+              ))}
+            </div>
             
             {/* Auth buttons */}
             <SignedOut>
@@ -218,16 +266,27 @@ export function Appbar() {
                   </div>
                   
                   <div className="mt-3 pt-3 border-t border-border">
-                    <Button 
-                      variant="ghost" 
-                      className="w-full justify-start text-muted-foreground hover:text-foreground"
-                      onClick={() => setIsOpen(false)}
-                      asChild
-                    >
-                      <Link href="/settings">
-                        <Settings className="mr-2 h-4 w-4" /> Settings
-                      </Link>
-                    </Button>
+                    <div className="flex items-center gap-3 px-1 py-2">
+                      {socialLinks.map((link) => (
+                        <motion.a
+                          key={link.name}
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={cn(
+                            "p-2 rounded-full text-muted-foreground transition-all duration-200",
+                            "hover:bg-secondary/60",
+                            link.color
+                          )}
+                          whileHover={{ y: -2 }}
+                          whileTap={{ scale: 0.95 }}
+                          title={link.name}
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {link.icon}
+                        </motion.a>
+                      ))}
+                    </div>
                   </div>
                 </SignedIn>
               </div>
@@ -241,12 +300,18 @@ export function Appbar() {
                   <span className="text-sm text-muted-foreground">UptimeCheck v1.0</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Button variant="ghost" size="icon" className="rounded-full h-7 w-7">
-                    <Bell className="h-4 w-4 text-muted-foreground" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="rounded-full h-7 w-7">
-                    <Settings className="h-4 w-4 text-muted-foreground" />
-                  </Button>
+                  {socialLinks.slice(0, 2).map((link) => (
+                    <motion.a
+                      key={link.name}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 rounded-full text-muted-foreground hover:bg-secondary/60 transition-colors"
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {link.icon}
+                    </motion.a>
+                  ))}
                 </div>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import { SquareActivity, Github, Twitter, Linkedin } from "lucide-react";
+import { SquareActivity, Github, Linkedin, ExternalLink } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -13,20 +13,35 @@ export default function Footer() {
               <span className="ml-2 text-xl font-semibold">UptimeCheck</span>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground">
-              Reliable monitoring for all your web services, APIs, and websites.
+              Professional website monitoring with real-time alerts and comprehensive analytics.
             </p>
             <div className="mt-6 flex space-x-4">
-              <a href="#" className="text-muted-foreground hover:text-foreground">
+              <a 
+                href="https://github.com/AAYUSH412" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
                 <Github className="h-5 w-5" />
                 <span className="sr-only">GitHub</span>
               </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground">
-                <Twitter className="h-5 w-5" />
-                <span className="sr-only">Twitter</span>
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-foreground">
+              <a 
+                href="https://www.linkedin.com/in/aayush-vaghela/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
                 <Linkedin className="h-5 w-5" />
                 <span className="sr-only">LinkedIn</span>
+              </a>
+              <a 
+                href="https://aayush-vaghela.vercel.app/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <ExternalLink className="h-5 w-5" />
+                <span className="sr-only">Portfolio</span>
               </a>
             </div>
           </div>
@@ -82,11 +97,51 @@ export default function Footer() {
               </ul>
             </div>
             <div>
+              <h3 className="text-sm font-semibold">About</h3>
+              <ul className="mt-4 space-y-2">
+                <li>
+                  <a 
+                    href="https://aayush-vaghela.vercel.app/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    Developer Portfolio
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="https://github.com/AAYUSH412" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    GitHub Projects
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="https://www.linkedin.com/in/aayush-vaghela/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    LinkedIn Profile
+                  </a>
+                </li>
+                <li>
+                  <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground">
+                    Contact Us
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
               <h3 className="text-sm font-semibold">Company</h3>
               <ul className="mt-4 space-y-2">
                 <li>
-                  <Link href="/about" className="text-sm text-muted-foreground hover:text-foreground">
-                    About
+                  <Link href="#about" className="text-sm text-muted-foreground hover:text-foreground">
+                    About UptimeCheck
                   </Link>
                 </li>
                 <li>
@@ -95,13 +150,13 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contact" className="text-sm text-muted-foreground hover:text-foreground">
-                    Contact
+                  <Link href="/enterprise" className="text-sm text-muted-foreground hover:text-foreground">
+                    Enterprise
                   </Link>
                 </li>
                 <li>
-                  <Link href="/careers" className="text-sm text-muted-foreground hover:text-foreground">
-                    Careers
+                  <Link href="/security" className="text-sm text-muted-foreground hover:text-foreground">
+                    Security
                   </Link>
                 </li>
               </ul>
@@ -109,19 +164,29 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-16 border-t pt-8">
-          <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} UptimeCheck. All rights reserved.
-          </p>
-          <div className="mt-4 flex space-x-6">
-            <Link href="/terms" className="text-xs text-muted-foreground hover:text-foreground">
-              Terms of Service
-            </Link>
-            <Link href="/privacy" className="text-xs text-muted-foreground hover:text-foreground">
-              Privacy Policy
-            </Link>
-            <Link href="/cookies" className="text-xs text-muted-foreground hover:text-foreground">
-              Cookie Policy
-            </Link>
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <p className="text-sm text-muted-foreground">
+              &copy; {new Date().getFullYear()} UptimeCheck. Built with ❤️ by{" "}
+              <a 
+                href="https://aayush-vaghela.vercel.app/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-400 transition-colors"
+              >
+                Aayush Vaghela
+              </a>
+            </p>
+            <div className="mt-4 md:mt-0 flex space-x-6">
+              <Link href="/terms" className="text-xs text-muted-foreground hover:text-foreground">
+                Terms of Service
+              </Link>
+              <Link href="/privacy" className="text-xs text-muted-foreground hover:text-foreground">
+                Privacy Policy
+              </Link>
+              <Link href="/cookies" className="text-xs text-muted-foreground hover:text-foreground">
+                Cookie Policy
+              </Link>
+            </div>
           </div>
         </div>
       </div>

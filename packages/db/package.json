@@ -1,12 +1,25 @@
 {
   "name": "db",
+  "version": "0.0.1",
   "module": "index.ts",
   "type": "module",
   "exports": {
     "./client": "./src/index.ts"
   },
+  "scripts": {
+    "seed": "bun seed.ts",
+    "generate": "prisma generate",
+    "migrate": "prisma migrate dev",
+    "studio": "prisma studio",
+    "push": "prisma db push",
+    "reset": "prisma migrate reset",
+    "build": "tsc",
+    "lint": "eslint .",
+    "check-types": "tsc --noEmit"
+  },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "typescript": "^5.8.2"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -14,8 +27,5 @@
   "dependencies": {
     "@prisma/client": "^6.5.0",
     "prisma": "^6.5.0"
-  },
-  "scripts": {
-    "seed": "bun seed.ts"
   }
 }
