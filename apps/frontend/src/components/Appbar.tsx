@@ -63,6 +63,8 @@ export function Appbar() {
 
   // Handle scroll effect - make navbar transparent or solid
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const handleScroll = () => {
       if (window.scrollY > 20) {
         setScrolled(true);

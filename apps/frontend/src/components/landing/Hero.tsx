@@ -18,9 +18,16 @@ import { Button } from "@/components/ui/button";
 
 export default function Hero() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Track mouse position for interactive effects
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
@@ -96,34 +103,36 @@ export default function Hero() {
       />
 
       {/* Floating particles */}
-      <div className="absolute inset-0 z-10">
-        {[...Array(6)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute"
-            initial={{ 
-              x: Math.random() * window.innerWidth, 
-              y: Math.random() * window.innerHeight 
-            }}
-            animate={{
-              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-              y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
-            }}
-            transition={{
-              duration: 20 + Math.random() * 10,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          >
-            <div 
-              className="h-2 w-2 rounded-full bg-gradient-to-r from-purple-400 to-blue-400 opacity-60"
-              style={{
-                boxShadow: "0 0 20px rgba(147, 51, 234, 0.5)"
+      {isClient && (
+        <div className="absolute inset-0 z-10">
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute"
+              initial={{ 
+                x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000), 
+                y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000) 
               }}
-            />
-          </motion.div>
-        ))}
-      </div>
+              animate={{
+                x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+                y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
+              }}
+              transition={{
+                duration: 20 + Math.random() * 10,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+            >
+              <div 
+                className="h-2 w-2 rounded-full bg-gradient-to-r from-purple-400 to-blue-400 opacity-60"
+                style={{
+                  boxShadow: "0 0 20px rgba(147, 51, 234, 0.5)"
+                }}
+              />
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       {/* Main content */}
       <div className="relative z-20 flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
