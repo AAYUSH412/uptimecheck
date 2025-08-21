@@ -1,8 +1,13 @@
 {
+  "framework": "nextjs",
   "buildCommand": "bun run build",
   "outputDirectory": ".next",
-  "installCommand": "bun install",
-  "framework": "nextjs",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
+  "functions": {
+    "apps/frontend/src/app/**": {
+      "maxDuration": 10
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",
@@ -82,6 +87,10 @@
   "trailingSlash": false,
   "env": {
     "NEXT_PUBLIC_APP_URL": "https://uptimecheck.vercel.app",
-    "NEXT_PUBLIC_API_URL": "https://api.uptimecheck.vercel.app"
+    "NEXT_PUBLIC_API_URL": "https://api.uptimecheck.vercel.app",
+    "BUN_INSTALL_CACHE_DIR": "/tmp/.bun-cache",
+    "SKIP_ENV_VALIDATION": "1",
+    "VERCEL": "1",
+    "NODE_ENV": "production"
   }
 }

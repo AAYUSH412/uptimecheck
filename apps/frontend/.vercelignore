@@ -1,0 +1,25 @@
+# Ignore the entire monorepo except what we need
+/apps/api
+/apps/hub  
+/apps/validator
+/packages/db/prisma
+/packages/db/src
+/.github
+/docker-compose*
+/Dockerfile*
+
+# Ignore development files
+**/.env.local
+**/.env.development
+**/node_modules
+**/.turbo
+**/dist
+**/*.log
+**/.DS_Store
+
+# Keep only essential files
+!/packages/common
+!/packages/db/package.json
+!/packages/db/prisma/schema.prisma
+!/packages/eslint-config
+!/packages/typescript-config
