@@ -3,11 +3,6 @@
   "buildCommand": "bun run build",
   "outputDirectory": ".next",
   "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
-  "functions": {
-    "apps/frontend/src/app/**": {
-      "maxDuration": 10
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",
