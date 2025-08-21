@@ -3,12 +3,6 @@
   "outputDirectory": ".next",
   "installCommand": "bun install",
   "framework": "nextjs",
-  "crons": [
-    {
-      "path": "/api/cron/uptime-check",
-      "schedule": "*/5 * * * *"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
