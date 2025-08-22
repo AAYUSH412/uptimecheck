@@ -18,8 +18,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Website } from "./mockData";
 import axios from "axios";
-import { BACKEND_URL } from "../../../config";
 import { motion } from "framer-motion";
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
+
 
 interface AddWebsiteDialogProps {
   onWebsiteAdded: (website: Website) => void;

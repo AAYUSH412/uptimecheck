@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "name": "uptimecheck-frontend",
+  "buildCommand": "cd apps/frontend && npm run build",
+  "outputDirectory": "apps/frontend/.next", 
+  "installCommand": "npm install --prefix apps/frontend",
+  "framework": "nextjs",
+  "rootDirectory": "apps/frontend"
+}

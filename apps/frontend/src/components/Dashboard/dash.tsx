@@ -149,7 +149,7 @@ export default function DashboardPage() {
   )
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-background via-background to-muted/10 pt-16">
+    <div className="flex min-h-screen bg-gradient-to-br from-background via-background to-muted/10">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex lg:w-80 lg:flex-col lg:fixed lg:inset-y-16 lg:top-16 border-r bg-card/80 backdrop-blur-md">
         <SidebarContent />

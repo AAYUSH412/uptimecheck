@@ -37,8 +37,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import axios from "axios";
-import { BACKEND_URL } from "../../../config";
 import { useAuth } from "@clerk/nextjs";
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
+
 
 interface WebsiteDetailProps {
   website: Website;

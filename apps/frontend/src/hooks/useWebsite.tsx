@@ -3,7 +3,9 @@
 import { useAuth } from "@clerk/nextjs";
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { BACKEND_URL } from "../../config";
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
+
 
 interface Tick {
   id: string;

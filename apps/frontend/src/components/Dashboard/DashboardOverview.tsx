@@ -11,7 +11,6 @@ import { DashboardSkeleton } from "./DashboardSkeleton"
 import { EmptyState } from "./EmptyState"
 import { useAuth } from "@clerk/nextjs"
 import axios from "axios"
-import { BACKEND_URL } from "../../../config"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +21,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
 interface DashboardOverviewProps {
   websites: Website[]
