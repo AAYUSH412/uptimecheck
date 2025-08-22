@@ -1,8 +1,14 @@
 {
   "version": 2,
   "name": "uptimecheck-frontend",
-  "buildCommand": "cd apps/frontend && npm run build",
+  "buildCommand": "cd apps/frontend && npm install && npm run build",
   "outputDirectory": "apps/frontend/.next",
-  "installCommand": "npm install",
-  "framework": "nextjs"
+  "installCommand": "cd apps/frontend && npm install",
+  "framework": "nextjs",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./apps/frontend/",
+  "env": {
+    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY": "@next_public_clerk_publishable_key",
+    "CLERK_SECRET_KEY": "@clerk_secret_key",
+    "NEXT_PUBLIC_BACKEND_URL": "@next_public_backend_url"
+  }
 }
