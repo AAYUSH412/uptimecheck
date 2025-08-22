@@ -4,10 +4,5 @@
   "buildCommand": "cd apps/frontend && npm run build",
   "outputDirectory": "apps/frontend/.next",
   "installCommand": "npm install",
-  "framework": "nextjs",
-  "env": {
-    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY": "@clerk_publishable_key",
-    "CLERK_SECRET_KEY": "@clerk_secret_key",
-    "NEXT_PUBLIC_BACKEND_URL": "@backend_url"
-  }
+  "framework": "nextjs"
 }
