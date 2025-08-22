@@ -5,15 +5,6 @@
   "outputDirectory": "apps/frontend/.next",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "builds": [
-    {
-      "src": "apps/frontend/package.json",
-      "use": "@vercel/next",
-      "config": {
-        "distDir": ".next"
-      }
-    }
-  ],
   "routes": [
     {
       "src": "/api/(.*)",
