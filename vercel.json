@@ -1,8 +1,8 @@
 {
   "version": 2,
   "name": "uptimecheck-frontend",
-  "buildCommand": "npm install && npm run build",
+  "buildCommand": "bun install && bun run build",
   "outputDirectory": "frontend/.next",
-  "installCommand": "npm install",
+  "installCommand": "bun install",
   "framework": "nextjs"
 }
