@@ -1,7 +1,7 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "bun run build",
   "outputDirectory": ".next",
-  "installCommand": "npm install",
+  "installCommand": "bun install",
   "framework": "nextjs",
   "functions": {
     "app/**/*.js": {
