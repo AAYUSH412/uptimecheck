@@ -1,9 +1,9 @@
 {
   "version": 2,
   "name": "uptimecheck-frontend",
-  "buildCommand": "bun install && ESLINT_NO_DEV_ERRORS=true bun run build",
-  "outputDirectory": "cd frontend/.next",
-  "installCommand": "bun install",
+  "buildCommand": "cd apps/frontend && bun install && ESLINT_NO_DEV_ERRORS=true bun run build",
+  "outputDirectory": "apps/frontend/.next",
+  "installCommand": "cd apps/frontend && bun install",
   "framework": "nextjs",
   "env": {
     "ESLINT_NO_DEV_ERRORS": "true"
