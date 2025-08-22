@@ -38,7 +38,7 @@ export default function NotFound() {
             className="mb-8 flex justify-center"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+            transition={{ delay: 0.2, type: "spring" as const, stiffness: 200 }}
           >
             <div className="rounded-full bg-red-100 p-4 dark:bg-red-900/20 ring-8 ring-red-100/20 dark:ring-red-900/10">
               <AlertCircle className="h-12 w-12 text-red-500" />

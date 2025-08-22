@@ -193,7 +193,7 @@ export default function CTA() {
                 key={index}
                 className="text-center"
                 whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 400 }}
+                transition={{ type: "spring" as const, stiffness: 400 }}
               >
                 <div className={`text-3xl md:text-4xl font-bold ${stat.color} mb-2`}>
                   {stat.number}

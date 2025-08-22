@@ -409,7 +409,7 @@ export function WebsiteDetail({ website, onBack, onDelete }: WebsiteDetailProps)
                                 x: 0, 
                                 scale: 1,
                                 transition: {
-                                  type: "spring",
+                                  type: "spring" as const,
                                   stiffness: 400,
                                   damping: 25,
                                   delay: index * 0.1
@@ -419,7 +419,7 @@ export function WebsiteDetail({ website, onBack, onDelete }: WebsiteDetailProps)
                                 scale: 1.02,
                                 x: 4,
                                 transition: {
-                                  type: "spring",
+                                  type: "spring" as const,
                                   stiffness: 400,
                                   damping: 20
                                 }
@@ -504,7 +504,7 @@ export function WebsiteDetail({ website, onBack, onDelete }: WebsiteDetailProps)
                                   scaleY: 1, 
                                   y: 0,
                                   transition: {
-                                    type: "spring",
+                                    type: "spring" as const,
                                     stiffness: 400,
                                     damping: 25,
                                     delay: index * 0.05
@@ -514,7 +514,7 @@ export function WebsiteDetail({ website, onBack, onDelete }: WebsiteDetailProps)
                                   scale: 1.05,
                                   y: -2,
                                   transition: {
-                                    type: "spring",
+                                    type: "spring" as const,
                                     stiffness: 400,
                                     damping: 20
                                   }

@@ -38,7 +38,7 @@ export function WebsiteSidebar({ websites, selectedWebsite, onSelectWebsite }: W
               x: 0, 
               scale: 1,
               transition: {
-                type: "spring",
+                type: "spring" as const,
                 stiffness: 400,
                 damping: 25,
                 delay: index * 0.05
@@ -53,7 +53,7 @@ export function WebsiteSidebar({ websites, selectedWebsite, onSelectWebsite }: W
             whileHover={{ 
               x: 4,
               transition: {
-                type: "spring",
+                type: "spring" as const,
                 stiffness: 400,
                 damping: 20
               }
@@ -120,7 +120,7 @@ export function WebsiteSidebar({ websites, selectedWebsite, onSelectWebsite }: W
                       opacity: 1, 
                       scale: 1,
                       transition: {
-                        type: "spring",
+                        type: "spring" as const,
                         stiffness: 500,
                         damping: 30
                       }

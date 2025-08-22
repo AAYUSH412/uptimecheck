@@ -285,7 +285,7 @@ export function DashboardOverview({
                       y: 0, 
                       scale: 1,
                       transition: {
-                        type: "spring",
+                        type: "spring" as const,
                         stiffness: 400,
                         damping: 25,
                         delay: index * 0.1
@@ -295,7 +295,7 @@ export function DashboardOverview({
                       scale: 1.02,
                       y: -4,
                       transition: {
-                        type: "spring",
+                        type: "spring" as const,
                         stiffness: 400,
                         damping: 20
                       }

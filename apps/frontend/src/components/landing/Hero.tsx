@@ -54,7 +54,7 @@ export default function Hero() {
       y: 0,
       opacity: 1,
       transition: { 
-        type: "spring", 
+        type: "spring" as const, 
         stiffness: 100,
         damping: 15
       },
@@ -251,7 +251,7 @@ export default function Hero() {
                 key={index}
                 className="text-center"
                 whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 400 }}
+                transition={{ type: "spring" as const, stiffness: 400 }}
               >
                 <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
                   {stat.number}
