@@ -28,10 +28,6 @@
     "node": ">=18"
   },
   "packageManager": "bun@1.2.18",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "dependencies": {
     "next": "^15.5.0",
     "react": "^19.1.1",
