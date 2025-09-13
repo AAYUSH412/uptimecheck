@@ -67,7 +67,7 @@ export default function Hero() {
       transition: {
         duration: 3,
         repeat: Infinity,
-        ease: "easeInOut"
+        ease: "easeInOut" as const
       }
     }
   };
@@ -120,7 +120,7 @@ export default function Hero() {
               transition={{
                 duration: 20 + Math.random() * 10,
                 repeat: Infinity,
-                ease: "linear"
+                ease: "linear" as const
               }}
             >
               <div 
@@ -251,7 +251,7 @@ export default function Hero() {
                 key={index}
                 className="text-center"
                 whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 400 }}
+                transition={{ type: "spring" as const, stiffness: 400 }}
               >
                 <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
                   {stat.number}
