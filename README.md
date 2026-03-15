@@ -1,42 +1,27 @@
-# UptimeCheck
+# 🌐 UptimeCheck
+
+**A distributed, high-performance website monitoring platform built with modern web technologies.**
+
+UptimeCheck is a monorepo containing everything needed to run a scalable uptime monitoring service. It separates the **Control Plane** (API/Frontend) from the **Data Plane** (Hub/Validators), allowing for a globally distributed network of monitoring nodes.
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![CI](https://github.com/AAYUSH412/uptimecheck/actions/workflows/ci.yml/badge.svg)
+![Runtime](https://img.shields.io/badge/runtime-bun-black?logo=bun)
 
 <div align="center">
-  <img src="./apps/frontend/public/square-activity.svg" alt="UptimeCheck Logo" width="120"/>
-  
-  <h3>🚀 Enterprise-Grade Website & API Monitoring Platform</h3>
-  <p><em>Real-time uptime tracking with distributed architecture and advanced analytics</em></p>
-  
-  [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-5.8+-blue.svg)](https://www.typescriptlang.org/)
-  [![Next.js](https://img.shields.io/badge/Next.js-15.2+-black.svg)](https://nextjs.org/)
-  [![Bun](https://img.shields.io/badge/Bun-1.2+-orange.svg)](https://bun.sh/)
-  
-  <p>
-    <a href="#-features">Features</a> •
-    <a href="#-architecture">Architecture</a> •
-    <a href="#-tech-stack">Tech Stack</a> •
-    <a href="#-getting-started">Getting Started</a> •
-    <a href="#-development">Development</a> •
-    <a href="#-deployment">Deployment</a> •
-    <a href="#-contributing">Contributing</a>
-  </p>
+  <a href="https://uptimecheck.vercel.app/demo/dashboard">
+    <img src="https://img.shields.io/badge/🚀_Live_Demo-Try_Without_Signup-4F6EF7?style=for-the-badge" alt="Live Demo" />
+  </a>
+  &nbsp;
+  <a href="https://github.com/AAYUSH412/uptimecheck">
+    <img src="https://img.shields.io/badge/⭐_Star_on_GitHub-black?style=for-the-badge&logo=github" alt="Star on GitHub" />
+  </a>
 </div>
 
----
-
-## 🌟 Overview
-
-**UptimeCheck** is a robust, enterprise-grade monitoring solution that continuously tracks and reports the uptime status of websites and APIs. Built with modern microservices architecture, it provides real-time monitoring, detailed analytics, instant alerts, and comprehensive performance insights.
-
-### 🎯 **Key Highlights**
-- **⚡ Real-time Monitoring** - Sub-second response time tracking
-- **🌍 Global Distribution** - Multi-region validator network
-- **📊 Advanced Analytics** - Historical trends and performance metrics
-- **🔐 Enterprise Security** - Cryptographic authentication and data integrity
-- **🚀 Modern Stack** - Next.js 15, Bun runtime, WebSocket communication
+<br/>
 
 <div align="center">
-  <img src="https://ik.imagekit.io/r9naagwrj/Github/Screenshot%202025-04-01%20at%204.55.55%E2%80%AFPM.png?updatedAt=1743506875112" alt="UptimeCheck Dashboard Preview" width="800"/>
+  <img src="https://ik.imagekit.io/xh3awoalr/Portfolio/Dashboard.png" alt="UptimeCheck Dashboard Preview" width="800"/>
   <p><em>Modern, intuitive dashboard with real-time monitoring capabilities</em></p>
 </div>
 
@@ -99,6 +84,37 @@
 - **TweetNaCl** - Cryptographic library for message signing
 - **JWT** - JSON Web Tokens for API authentication
 - **Clerk** - Enterprise authentication provider
+
+## 📸 Screenshots
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="50%">
+        <img src="https://ik.imagekit.io/xh3awoalr/Portfolio/Home.png" alt="Landing Page" width="100%"/>
+        <br/><em>Landing Page</em>
+      </td>
+      <td align="center" width="50%">
+        <img src="https://ik.imagekit.io/xh3awoalr/Portfolio/Dashboard.png" alt="Dashboard Overview" width="100%"/>
+        <br/><em>Dashboard Overview</em>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="50%">
+        <img src="https://ik.imagekit.io/xh3awoalr/Portfolio/Dashboard_monitor_1.png" alt="Monitor Detail" width="100%"/>
+        <br/><em>Monitor Detail View</em>
+      </td>
+      <td align="center" width="50%">
+        <img src="https://ik.imagekit.io/xh3awoalr/Portfolio/Dashboard_monitor_2.png" alt="Monitor Analytics" width="100%"/>
+        <br/><em>Monitor Analytics</em>
+      </td>
+    </tr>
+  </table>
+</div>
+
+> **No backend? No problem.** Try the fully interactive demo at [`/demo/dashboard`](https://uptimecheck.vercel.app/demo/dashboard) — no login, no setup required.
+
+---
 
 ## 🏗️ Architecture
 
@@ -169,6 +185,8 @@ graph TB
 ```
 
 ## 🚀 Getting Started
+
+> **Want to explore immediately?** Visit the [**Live Demo →**](https://uptimecheck.vercel.app/demo/dashboard) — no login, no setup, fully interactive.
 
 ### 📋 **Prerequisites**
 

@@ -1,15 +1,13 @@
-# Hub Service
+# 🧠 UptimeCheck Hub
 
-The Hub service is the central coordinator of the UptimeCheck monitoring platform. It manages validator registration, distributes monitoring tasks, and aggregates results using WebSocket communication. Built with Bun's native WebSocket support, it handles real-time communication between validators and stores monitoring data.
+The central orchestration server for the distributed uptime monitoring system. The Hub manages validator registrations, distributes monitoring tasks, and aggregates results using WebSocket communication.
 
-## 📋 Overview
+## 🎯 Core Responsibilities
 
-The Hub acts as the orchestration layer that:
-- Manages validator registrations and authentication
-- Distributes website monitoring tasks to available validators
-- Receives and stores uptime check results
-- Handles cryptographic verification of validator messages
-- Manages validator payouts and rewards
+1. **Validator Registry**: Manages connection and authentication of Validator nodes (workers)
+2. **Task Distribution**: Assigns websites to be checked to connected validators
+3. **Result Aggregation**: Receives UP/DOWN signals and latencies, persisting them to the database
+4. **Security**: Verifies cryptographic signatures from validators using Solana/TweetNaCl keys
 
 ## 🚀 Getting Started
 

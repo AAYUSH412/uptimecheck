@@ -1,14 +1,13 @@
 import express from 'express';
-import { getWebsite, getWebsiteStatus, postWebsite, deleteWebsite } from '../controller/apicontroller.js';
+import { getWebsite, postWebsite, deleteWebsite } from '../controller/apicontroller.js';
 import { authmiddleware } from '../middleware.js';
-import { prismaclient } from "db/client"
-
+import { rateLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
-router.post('/website', authmiddleware, postWebsite);
-router.get('/website', authmiddleware, getWebsite);
-router.get('/website/status', authmiddleware, getWebsiteStatus);
-router.delete('/website', authmiddleware, deleteWebsite);
+// Apply rate limiter after auth so it can key by userId
+router.post('/website', authmiddleware, rateLimiter, postWebsite);
+router.get('/website', authmiddleware, rateLimiter, getWebsite);
+router.delete('/website', authmiddleware, rateLimiter, deleteWebsite);
 
 export default router;

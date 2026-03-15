@@ -1,270 +1,175 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { 
-  Zap, 
-  ArrowRight, 
-  Shield, 
-  Globe, 
-  Activity, 
-  CheckCircle,
-  Sparkles,
-  Play
-} from "lucide-react";
-import { SignUpButton } from "@clerk/nextjs";
+import { motion } from "motion/react";
+import { ArrowRight, CheckCircle2, Terminal } from "lucide-react";
+import { SignUpButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import ShimmerText from "@/components/kokonutui/shimmer-text";
 
 export default function Hero() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Track mouse position for interactive effects
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 30, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { 
-        type: "spring" as const, 
-        stiffness: 100,
-        damping: 15
-      },
-    },
-  };
-
-  const floatingVariants = {
-    float: {
-      y: [0, -10, 0],
-      transition: {
-        duration: 3,
-        repeat: Infinity,
-        ease: "easeInOut" as const
-      }
-    }
-  };
-
-  const features = [
-    { icon: <Shield className="h-5 w-5" />, text: "99.9% Uptime SLA" },
-    { icon: <Globe className="h-5 w-5" />, text: "Global Monitoring" },
-    { icon: <Activity className="h-5 w-5" />, text: "Real-time Alerts" },
-  ];
-
   return (
-    <section className="min-h-screen w-full relative overflow-hidden">
-      {/* Aurora Dream Diagonal Flow Background */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          background: `
-            radial-gradient(ellipse 80% 60% at 5% 40%, rgba(175, 109, 255, 0.48), transparent 67%),
-            radial-gradient(ellipse 70% 60% at 45% 45%, rgba(255, 100, 180, 0.41), transparent 67%),
-            radial-gradient(ellipse 62% 52% at 83% 76%, rgba(255, 235, 170, 0.44), transparent 63%),
-            radial-gradient(ellipse 60% 48% at 75% 20%, rgba(120, 190, 255, 0.36), transparent 66%),
-            linear-gradient(45deg, #f7eaff 0%, #fde2ea 100%)
-          `,
-        }}
-      />
+    <section className="relative min-h-[90vh] w-full overflow-hidden bg-[#0A0A0F] pt-24 pb-16 md:pt-32">
+      {/* Background radial gradient */}
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_50%_0%,rgba(79,110,247,0.1)_0%,transparent_60%)]" />
+      
+      {/* Dot Grid Background overlay */}
+      <div className="absolute inset-0 z-0 dot-grid-bg opacity-30 dot-grid-fade pointer-events-none" />
 
-      {/* Interactive gradient that follows mouse */}
-      <div
-        className="absolute inset-0 z-10 opacity-30 pointer-events-none"
-        style={{
-          background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(99, 102, 241, 0.15), transparent 40%)`,
-        }}
-      />
-
-      {/* Floating particles */}
-      {isClient && (
-        <div className="absolute inset-0 z-10">
-          {[...Array(6)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute"
-              initial={{ 
-                x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000), 
-                y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000) 
-              }}
-              animate={{
-                x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
-                y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
-              }}
-              transition={{
-                duration: 20 + Math.random() * 10,
-                repeat: Infinity,
-                ease: "linear" as const
-              }}
-            >
-              <div 
-                className="h-2 w-2 rounded-full bg-gradient-to-r from-purple-400 to-blue-400 opacity-60"
-                style={{
-                  boxShadow: "0 0 20px rgba(147, 51, 234, 0.5)"
-                }}
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full flex items-center">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center w-full">
+          
+          {/* Left Column: Text & CTA (7 cols) */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="lg:col-span-6 lg:pr-8 text-center lg:text-left flex flex-col items-center lg:items-start"
+          >
+            <div className="inline-flex mb-6 bg-white/5 border border-white/10 rounded-full px-1 py-0.5">
+              <ShimmerText 
+                text="UptimeCheck 2.0 is live" 
+                className="text-xs font-medium px-3 py-1 bg-transparent text-accent-foreground"
               />
-            </motion.div>
-          ))}
-        </div>
-      )}
-
-      {/* Main content */}
-      <div className="relative z-20 flex items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="max-w-5xl mx-auto text-center"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          {/* Badge */}
-          <motion.div variants={itemVariants} className="mb-8">
-            <div className="inline-flex items-center rounded-full bg-white/10 backdrop-blur-md px-4 py-2 text-sm font-medium text-purple-700 ring-1 ring-white/20 shadow-lg">
-              <Sparkles className="h-4 w-4 mr-2 text-purple-500" />
-              <span className="relative flex h-2 w-2 mr-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
+            </div>
+            
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6 leading-[1.1]">
+              Know when your site goes down,{" "}
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-[#4F6EF7] to-[#818CF8]">
+                before your users do.
               </span>
-              New: Advanced Analytics Dashboard Available
+            </h1>
+            
+            <p className="text-lg text-[#8888A8] mb-8 max-w-2xl leading-relaxed">
+              Distributed uptime monitoring via a global validator network. Real-time alerts via Email, Slack, and SMS within 60 seconds of any failure. Free for developers.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <SignedOut>
+                <SignUpButton mode="modal">
+                  <Button 
+                    size="lg" 
+                    className="h-12 px-8 rounded-full bg-[#4F6EF7] hover:bg-[#3A58E0] text-white font-semibold text-base transition-all shadow-[0_0_20px_rgba(79,110,247,0.3)] hover:shadow-[0_0_30px_rgba(79,110,247,0.5)] group"
+                  >
+                    Start Monitoring Free
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                </SignUpButton>
+              </SignedOut>
+              <SignedIn>
+                <Button 
+                  size="lg" 
+                  className="h-12 px-8 rounded-full bg-[#4F6EF7] hover:bg-[#3A58E0] text-white font-semibold text-base transition-all shadow-[0_0_20px_rgba(79,110,247,0.3)] hover:shadow-[0_0_30px_rgba(79,110,247,0.5)] group"
+                  asChild
+                >
+                  <Link href="/dashboard">
+                    Go to Dashboard
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </Button>
+              </SignedIn>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="h-12 px-8 rounded-full border-white/10 bg-white/5 hover:bg-white/10 text-white font-medium group"
+                asChild
+              >
+                <Link href="/demo/dashboard">
+                  <Terminal className="mr-2 h-4 w-4 transition-colors group-hover:text-[#4F6EF7]" />
+                  Try Live Demo
+                </Link>
+              </Button>
+            </div>
+            
+            <div className="mt-10 flex items-center justify-center lg:justify-start gap-4 text-sm text-[#8888A8]">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-[#00C48C]" />
+                <span>No credit card required</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="h-4 w-4 text-[#00C48C]" />
+                <span>Cancel anytime</span>
+              </div>
             </div>
           </motion.div>
 
-          {/* Main heading */}
-          <motion.h1
-            variants={itemVariants}
-            className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6"
+          {/* Right Column: Hero Mockup Widget (Magic UI Glow effect) (6 cols) */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95, rotateX: 10 }}
+            animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            className="lg:col-span-6 relative mt-12 lg:mt-0 perspective-1000 hidden md:block"
           >
-            <span className="bg-gradient-to-r from-gray-900 via-purple-800 to-gray-900 bg-clip-text text-transparent">
-              Monitor with
-            </span>
-            <br />
-            <span className="relative inline-block">
-              <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-                Confidence
-              </span>
-              <motion.div
-                className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-full"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ duration: 1, delay: 1.5 }}
-              />
-            </span>
-          </motion.h1>
-
-          {/* Subtitle */}
-          <motion.p
-            variants={itemVariants}
-            className="text-xl md:text-2xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed"
-          >
-            Professional website monitoring with real-time alerts, detailed analytics, 
-            and enterprise-grade reliability. Never miss downtime again.
-          </motion.p>
-
-          {/* CTA Buttons */}
-          <motion.div
-            variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
-          >
-            <SignUpButton mode="modal">
-              <Button
-                size="lg"
-                className="group bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-2xl shadow-purple-500/25 px-8 py-4 text-lg font-semibold rounded-2xl transition-all duration-300 hover:scale-105"
-              >
-                <span className="flex items-center">
-                  Start Monitoring Free
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </span>
-              </Button>
-            </SignUpButton>
-            
-            <Button
-              size="lg"
-              variant="outline"
-              className="group border-2 border-purple-200 bg-white/50 backdrop-blur-md hover:bg-white/70 text-purple-700 px-8 py-4 text-lg font-semibold rounded-2xl transition-all duration-300 hover:scale-105"
-              asChild
+            {/* The Magic UI widget effect */}
+            <div 
+              className="relative w-full max-w-lg mx-auto rounded-2xl bg-[#111118] border border-white/10 overflow-hidden shadow-2xl hero-widget-glow z-10"
+              style={{
+                transform: "rotateX(4deg) rotateY(-4deg)",
+                transformStyle: "preserve-3d"
+              }}
             >
-              <Link href="#demo">
-                <Play className="mr-2 h-5 w-5" />
-                Watch Demo
-              </Link>
-            </Button>
-          </motion.div>
-
-          {/* Features grid */}
-          <motion.div
-            variants={itemVariants}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16"
-          >
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                variants={floatingVariants}
-                animate="float"
-                transition={{ delay: index * 0.2 }}
-                className="flex items-center justify-center gap-3 p-6 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-              >
-                <div className="p-2 rounded-lg bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg">
-                  {feature.icon}
+              {/* Fake Mac window header */}
+              <div className="flex items-center gap-1.5 px-4 py-3 border-b border-white/5 bg-[#1A1A24]">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+                <div className="ml-2 text-xs font-mono text-[#8888A8] flex items-center gap-2">
+                  <Terminal className="h-3 w-3" />
+                  uptime_status
                 </div>
-                <span className="font-semibold text-gray-800">{feature.text}</span>
-              </motion.div>
-            ))}
-          </motion.div>
+              </div>
 
-          {/* Stats */}
-          <motion.div
-            variants={itemVariants}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8"
-          >
-            {[
-              { number: "10K+", label: "Websites Monitored" },
-              { number: "99.9%", label: "Uptime Accuracy" },
-              { number: "50+", label: "Global Locations" },
-              { number: "24/7", label: "Expert Support" },
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                className="text-center"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring" as const, stiffness: 400 }}
-              >
-                <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
-                  {stat.number}
+              {/* Widget Content */}
+              <div className="p-5 flex flex-col gap-4">
+                <div className="flex items-center justify-between pb-3 border-b border-white/5">
+                  <span className="text-sm font-semibold text-white">Production Services</span>
+                  <div className="flex items-center gap-2 bg-[#00C48C]/10 text-[#00C48C] px-2.5 py-1 rounded-full text-xs font-medium border border-[#00C48C]/20">
+                    <div className="status-dot-up w-1.5 h-1.5" />
+                    All Systems Operational
+                  </div>
                 </div>
-                <div className="text-gray-600 font-medium">{stat.label}</div>
-              </motion.div>
-            ))}
+
+                {/* Status Rows */}
+                <div className="space-y-3">
+                  {[
+                    { name: 'App Frontend', url: 'https://app.acme.com', status: 'up', time: '124ms' },
+                    { name: 'Marketing Site', url: 'https://acme.com', status: 'up', time: '82ms' },
+                    { name: 'Core API Layer', url: 'api.acme.com/v1', status: 'up', time: '215ms' },
+                  ].map((site, i) => (
+                    <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/2 border border-white/5 group hover:bg-white/4 transition-colors">
+                      <div>
+                        <div className="text-sm font-medium text-white mb-1">{site.name}</div>
+                        <div className="text-xs font-mono text-[#8888A8] truncate max-w-45">{site.url}</div>
+                      </div>
+                      <div className="flex items-center gap-4 text-right">
+                        <span className="text-xs font-mono text-[#8888A8]">{site.time}</span>
+                        <div className="status-dot-up" />
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Down status example */}
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-[#FF4D6A]/5 border border-[#FF4D6A]/20">
+                    <div>
+                      <div className="text-sm font-medium text-white mb-1">Payment Webhook</div>
+                      <div className="text-xs font-mono text-[#8888A8]">webhooks/stripe</div>
+                    </div>
+                    <div className="flex items-center gap-4 text-right">
+                      <span className="text-xs font-mono text-[#FF4D6A]">Timeout</span>
+                      <div className="status-dot-down" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Glowing orb behind widget */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-linear-to-r from-[#4F6EF7]/20 to-purple-500/20 blur-[100px] -z-10 rounded-full pointer-events-none" />
           </motion.div>
-        </motion.div>
+          
+        </div>
       </div>
-
-      {/* Bottom fade effect */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent z-30" />
     </section>
   );
 }

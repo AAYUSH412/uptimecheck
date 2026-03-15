@@ -1,179 +1,127 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
-import { 
-  Bell, 
-  BarChart, 
-  Clock, 
-  Shield, 
-  Activity,
-  Server,
-  Globe,
-  Zap,
-  Eye,
-  TrendingUp,
-  Smartphone,
-  AlertTriangle
-} from "lucide-react";
+import { motion } from "motion/react";
+import { Globe2, BellRing, Activity, LayoutTemplate, LineChart } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const features = [
+  {
+    title: "Global Monitoring Network",
+    description: "Distributed validator nodes check your endpoints from multiple global regions every 60 seconds.",
+    icon: <Globe2 className="h-5 w-5 text-[#4F6EF7]" />,
+    className: "md:col-span-2 md:row-span-2",
+    visual: (
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_60%,rgba(79,110,247,0.1)_0%,transparent_50%)] pointer-events-none">
+        {/* Abstract map representation */}
+        <div className="absolute bottom-4 right-4 text-[#4F6EF7]/20">
+          <Globe2 className="w-48 h-48 sm:w-64 sm:h-64 stroke-[0.5]" />
+        </div>
+      </div>
+    ),
+  },
+  {
+    title: "Zero-Delay Alerting",
+    description: "Multi-channel alerts via Slack, Email, and SMS within 60s of failure.",
+    icon: <BellRing className="h-5 w-5 text-[#00C48C]" />,
+    className: "md:col-span-1 md:row-span-1",
+    visual: (
+      <div className="absolute top-4 right-4 bg-[#00C48C]/10 border border-[#00C48C]/20 rounded-full px-3 py-1 flex items-center gap-2">
+        <div className="w-1.5 h-1.5 rounded-full bg-[#00C48C] animate-pulse" />
+        <span className="text-[#00C48C] text-xs font-mono">Alert Sent</span>
+      </div>
+    ),
+  },
+  {
+    title: "Advanced API Checks",
+    description: "Assert status codes, JSON response bodies, and headers natively.",
+    icon: <Activity className="h-5 w-5 text-[#F59E0B]" />,
+    className: "md:col-span-1 md:row-span-1",
+    visual: (
+      <div className="absolute -bottom-4 -right-4 bg-[#111118] border border-white/10 rounded-xl p-4 w-48 shadow-xl opacity-50 group-hover:opacity-100 transition-opacity">
+        <div className="text-xs font-mono text-[#8888A8]">POST /api/v1/health</div>
+        <div className="text-xs font-mono text-[#00C48C] mt-1">{"{"} "status": "ok" {"}"}</div>
+      </div>
+    ),
+  },
+  {
+    title: "Beautiful Status Pages",
+    description: "Keep your customers informed with branded, real-time public status pages.",
+    icon: <LayoutTemplate className="h-5 w-5 text-[#4F6EF7]" />,
+    className: "md:col-span-1 md:row-span-2",
+    visual: (
+      <div className="absolute -bottom-10 right-4 w-40 h-48 bg-[#1A1A24] border border-white/10 rounded-t-xl shadow-2xl p-3 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+        <div className="w-full h-2 rounded bg-white/10 mb-2" />
+        <div className="w-full h-8 rounded bg-[#00C48C]/20 border border-[#00C48C]/30 mb-2" />
+        <div className="w-3/4 h-2 rounded bg-white/5 mb-1" />
+        <div className="w-1/2 h-2 rounded bg-white/5" />
+      </div>
+    ),
+  },
+  {
+    title: "Detailed Analytics",
+    description: "Track response times, uptime percentage streaks, and incident history.",
+    icon: <LineChart className="h-5 w-5 text-[#A78BFA]" />,
+    className: "md:col-span-2 md:row-span-1",
+    visual: (
+      <div className="absolute bottom-0 right-0 left-0 h-16 bg-gradient-to-t from-[#A78BFA]/10 to-transparent flex items-end px-6 overflow-hidden">
+        {/* Fake sparkline bars */}
+        <div className="flex items-end gap-1 w-full h-full opacity-30 group-hover:opacity-60 transition-opacity">
+          {[40, 50, 30, 60, 45, 70, 55, 80, 65, 90, 75, 100].map((h, i) => (
+            <div key={i} className="w-full bg-[#A78BFA] rounded-t-sm" style={{ height: `${h}%` }} />
+          ))}
+        </div>
+      </div>
+    ),
+  },
+];
 
 export default function Features() {
-  const features = [
-    {
-      icon: <Activity className="h-8 w-8" />,
-      title: "Real-time Monitoring",
-      description: "Monitor your websites and APIs 24/7 with sub-second response time tracking and instant detection of outages.",
-      gradient: "from-blue-500 to-cyan-500"
-    },
-    {
-      icon: <Bell className="h-8 w-8" />,
-      title: "Smart Alerts", 
-      description: "Get notified instantly via email, SMS, Slack, or webhooks when issues are detected. Custom escalation rules included.",
-      gradient: "from-purple-500 to-pink-500"
-    },
-    {
-      icon: <BarChart className="h-8 w-8" />,
-      title: "Advanced Analytics",
-      description: "Deep insights into performance trends, uptime statistics, and response times with beautiful, interactive charts.",
-      gradient: "from-green-500 to-emerald-500"
-    },
-    {
-      icon: <Globe className="h-8 w-8" />,
-      title: "Global Network",
-      description: "Monitor from 50+ locations worldwide to ensure your site performs well for users everywhere on the planet.",
-      gradient: "from-orange-500 to-red-500"
-    },
-    {
-      icon: <Shield className="h-8 w-8" />,
-      title: "Security Monitoring",
-      description: "SSL certificate monitoring, security headers checking, and vulnerability scanning to keep your site secure.",
-      gradient: "from-indigo-500 to-purple-500"
-    },
-    {
-      icon: <Zap className="h-8 w-8" />,
-      title: "Lightning Fast",
-      description: "Sub-second response times and instant notifications. Our monitoring infrastructure is built for speed and reliability.",
-      gradient: "from-yellow-500 to-orange-500"
-    }
-  ];
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 30, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring" as const,
-        stiffness: 100,
-        damping: 15
-      }
-    }
-  };
-
   return (
-    <section id="features" className="min-h-screen w-full relative">
-      {/* Dark Sphere Grid Background */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          background: "#020617",
-          backgroundImage: `
-            linear-gradient(to right, rgba(71,85,105,0.3) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(71,85,105,0.3) 1px, transparent 1px),
-            radial-gradient(circle at 50% 50%, rgba(139,92,246,0.15) 0%, transparent 70%)
-          `,
-          backgroundSize: "32px 32px, 32px 32px, 100% 100%",
-        }}
-      />
-
-      <div className="relative z-10 py-24 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <motion.div
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 30 }}
+    <section className="py-24 bg-[#0A0A0F] relative" id="features">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4"
           >
-            <h2 className="text-4xl md:text-6xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Powerful Features
-              </span>
-            </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
-              Everything you need to monitor, analyze, and optimize your website's performance with enterprise-grade reliability.
-            </p>
-          </motion.div>
+            Everything you need,<br/>
+            <span className="text-[#8888A8]">nothing you don't.</span>
+          </motion.h2>
+        </div>
 
-          {/* Features Grid */}
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                className="group relative"
-                whileHover={{ y: -10 }}
-                transition={{ type: "spring" as const, stiffness: 300 }}
-              >
-                <div className="h-full p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-white/20 transition-all duration-300 hover:bg-white/10">
-                  {/* Icon */}
-                  <div className={`inline-flex p-3 rounded-xl bg-gradient-to-r ${feature.gradient} text-white mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    {feature.icon}
-                  </div>
-
-                  {/* Content */}
-                  <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-blue-300 transition-colors">
-                    {feature.title}
-                  </h3>
-                  <p className="text-gray-400 leading-relaxed group-hover:text-gray-300 transition-colors">
-                    {feature.description}
-                  </p>
-
-                  {/* Hover effect background */}
-                  <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+        {/* Bento Grid layout */}
+        <div className="grid grid-cols-1 md:grid-cols-3 auto-rows-[220px] gap-4 md:gap-6">
+          {features.map((feature, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1, duration: 0.5 }}
+              className={cn(
+                "group relative overflow-hidden rounded-2xl glass-card border-white/5 hover:border-[#4F6EF7]/30 transition-colors duration-300 p-8 flex flex-col",
+                feature.className
+              )}
+            >
+              {/* Feature Content */}
+              <div className="relative z-10 flex flex-col h-full">
+                <div className="bg-[#1A1A24] w-12 h-12 rounded-xl flex items-center justify-center border border-white/10 mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                  {feature.icon}
                 </div>
-              </motion.div>
-            ))}
-          </motion.div>
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-[#8888A8] text-sm leading-relaxed max-w-[280px]">
+                  {feature.description}
+                </p>
+              </div>
 
-          {/* Bottom CTA */}
-          <motion.div
-            className="text-center mt-20"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            <div className="inline-flex items-center gap-4 p-6 rounded-2xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 backdrop-blur-sm">
-              <div className="flex items-center gap-2">
-                <Eye className="h-5 w-5 text-blue-400" />
-                <span className="text-gray-300">Join 10,000+ websites being monitored</span>
-              </div>
-              <div className="h-6 w-px bg-gray-600" />
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-green-400" />
-                <span className="text-gray-300">99.9% uptime guaranteed</span>
-              </div>
-            </div>
-          </motion.div>
+              {/* Decorative Visual component */}
+              {feature.visual}
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

@@ -62,8 +62,8 @@ bun run dev
 
 # Or start individual services:
 bun run dev --filter=frontend   # Next.js frontend on :3000
-bun run dev --filter=api        # Express API on :8080
-bun run dev --filter=hub        # WebSocket hub
+bun run dev --filter=api        # Express API on :4000
+bun run dev --filter=hub        # WebSocket hub on :4001
 bun run dev --filter=validator  # Uptime validator
 ```
 
@@ -119,7 +119,7 @@ DATABASE_URL="postgresql://postgres:password@localhost:5432/uptimecheck"
 ```bash
 DATABASE_URL="postgresql://postgres:password@localhost:5432/uptimecheck"
 JWT_SECRET="your-super-secret-jwt-key-here"
-PORT=8080
+PORT=4000
 NODE_ENV=development
 CORS_ORIGIN="http://localhost:3000"
 ```
@@ -128,7 +128,7 @@ CORS_ORIGIN="http://localhost:3000"
 ```bash
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="pk_test_..."
 CLERK_SECRET_KEY="sk_test_..."
-NEXT_PUBLIC_API_URL="http://localhost:8080"
+NEXT_PUBLIC_BACKEND_URL="http://localhost:4000"
 DATABASE_URL="postgresql://postgres:password@localhost:5432/uptimecheck"
 ```
 
@@ -178,7 +178,7 @@ bun prisma migrate reset
 
 ### Common Issues
 
-1. **Port conflicts**: Make sure ports 3000, 8080, and 5432 are available
+1. **Port conflicts**: Make sure ports 3000, 4000, 4001, and 5432 are available
 2. **Database connection**: Verify PostgreSQL is running and credentials are correct
 3. **Environment variables**: Ensure all required env vars are set
 4. **Dependencies**: Run `bun install` if packages are missing

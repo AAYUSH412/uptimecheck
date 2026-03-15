@@ -1,7 +1,9 @@
+"use client";
+
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Website } from "./mockData"
+import { Website } from "./types"
 import { Clock, Globe } from "lucide-react"
 
 interface WebsiteSidebarProps {
@@ -65,7 +67,7 @@ export function WebsiteSidebar({ websites, selectedWebsite, onSelectWebsite }: W
               onClick={() => onSelectWebsite(website)}
             >
               <div className="flex items-start space-x-3 w-full">
-                <div className="relative flex-shrink-0 mt-1">
+                <div className="relative shrink-0 mt-1">
                   <div
                     className={`h-3 w-3 rounded-full ${
                       website.status === "up" 

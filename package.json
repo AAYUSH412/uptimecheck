@@ -9,15 +9,14 @@
     "check-types": "turbo run check-types",
     "clean": "turbo run clean && rm -rf node_modules",
     "reset": "bun run clean && bun install",
-    "db:generate": "cd packages/db && bun prisma generate",
-    "db:migrate": "cd packages/db && bun prisma migrate dev",
-    "db:seed": "cd packages/db && bun run seed",
-    "db:studio": "cd packages/db && bun prisma studio",
-    "db:reset": "cd packages/db && bun prisma migrate reset",
+    "db:generate": "bun run --cwd packages/db generate",
+    "db:migrate": "bun run --cwd packages/db migrate",
+    "db:seed": "bun run --cwd packages/db seed",
+    "db:studio": "bun run --cwd packages/db studio",
+    "db:reset": "bun run --cwd packages/db reset",
     "docker:dev": "docker-compose -f docker-compose.dev.yml up -d",
     "docker:down": "docker-compose -f docker-compose.dev.yml down",
-    "docker:prod": "docker-compose up -d",
-    "prepare": "bun run db:generate"
+    "docker:prod": "docker-compose up -d"
   },
   "devDependencies": {
     "prettier": "^3.6.2",
@@ -28,9 +27,8 @@
     "node": ">=18"
   },
   "packageManager": "bun@1.2.18",
-  "dependencies": {
-    "next": "^15.5.0",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1"
-  }
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
 }

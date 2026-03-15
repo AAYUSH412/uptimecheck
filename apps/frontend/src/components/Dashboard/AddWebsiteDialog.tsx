@@ -16,18 +16,19 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Website } from "./mockData";
+import { Website } from "./types";
 import axios from "axios";
 import { motion } from "framer-motion";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000'
 
 
 interface AddWebsiteDialogProps {
   onWebsiteAdded: (website: Website) => void;
+  onSubmitWebsite?: (input: { name: string; url: string }) => Promise<Website | void>;
 }
 
-export function AddWebsiteDialog({ onWebsiteAdded }: AddWebsiteDialogProps) {
+export function AddWebsiteDialog({ onWebsiteAdded, onSubmitWebsite }: AddWebsiteDialogProps) {
   const { getToken } = useAuth();
   const [websiteName, setWebsiteName] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
@@ -57,6 +58,33 @@ export function AddWebsiteDialog({ onWebsiteAdded }: AddWebsiteDialogProps) {
     setError("");
 
     try {
+      if (onSubmitWebsite) {
+        const maybeWebsite = await onSubmitWebsite({
+          name: websiteName,
+          url: websiteUrl,
+        });
+
+        if (maybeWebsite) {
+          onWebsiteAdded(maybeWebsite);
+        } else {
+          onWebsiteAdded({
+            id: String(Date.now()),
+            name: websiteName || websiteUrl.replace(/^https?:\/\/(www\.)?/, '').split('/')[0],
+            url: websiteUrl,
+            status: "unknown",
+            uptime: "0%",
+            responseTime: "0ms",
+            lastChecked: "Just now",
+            uptimeHistory: []
+          });
+        }
+
+        setWebsiteName("");
+        setWebsiteUrl("");
+        setOpen(false);
+        return;
+      }
+
       const token = await getToken();
       const { data } = await axios.post(
         `${BACKEND_URL}/api/v1/website`,
@@ -98,26 +126,26 @@ export function AddWebsiteDialog({ onWebsiteAdded }: AddWebsiteDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="bg-primary hover:bg-primary/90 transition-all duration-200 hover:scale-105">
+        <Button size="sm" className="bg-[#4F6EF7] text-white hover:bg-[#3A58E0] transition-all duration-200">
           <Plus className="h-4 w-4 mr-2" />
           Add Website
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-125 p-0 overflow-hidden bg-[#0A0A0F] border border-white/10">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.2 }}
         >
-          <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6 border-b">
+          <div className="bg-[#111118]/80 p-6 border-b border-white/5">
             <DialogHeader>
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-primary/20 rounded-full">
-                  <Globe className="h-5 w-5 text-primary" />
+                <div className="p-2 bg-[#4F6EF7]/20 rounded-full border border-[#4F6EF7]/30">
+                  <Globe className="h-5 w-5 text-[#4F6EF7]" />
                 </div>
                 <div>
-                  <DialogTitle className="text-xl font-semibold">Add New Website</DialogTitle>
-                  <DialogDescription className="text-sm text-muted-foreground mt-1">
+                  <DialogTitle className="text-xl font-semibold text-white">Add New Website</DialogTitle>
+                  <DialogDescription className="text-sm text-[#8888A8] mt-1">
                     Start monitoring a new website for uptime and performance
                   </DialogDescription>
                 </div>
@@ -136,9 +164,9 @@ export function AddWebsiteDialog({ onWebsiteAdded }: AddWebsiteDialogProps) {
                   placeholder="e.g., My Portfolio Website"
                   value={websiteName}
                   onChange={(e) => setWebsiteName(e.target.value)}
-                  className="bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-200"
+                  className="bg-[#111118] border-white/10 text-white focus:border-[#4F6EF7]/50 transition-all duration-200"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-[#8888A8]">
                   A friendly name to identify this website
                 </p>
               </div>
@@ -152,9 +180,9 @@ export function AddWebsiteDialog({ onWebsiteAdded }: AddWebsiteDialogProps) {
                   placeholder="https://example.com"
                   value={websiteUrl}
                   onChange={(e) => setWebsiteUrl(e.target.value)}
-                  className="bg-background/50 border-border/50 focus:border-primary/50 transition-all duration-200"
+                  className="bg-[#111118] border-white/10 text-white focus:border-[#4F6EF7]/50 transition-all duration-200"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-[#8888A8]">
                   The complete URL including http:// or https://
                 </p>
               </div>
@@ -166,7 +194,7 @@ export function AddWebsiteDialog({ onWebsiteAdded }: AddWebsiteDialogProps) {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex items-center space-x-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg"
               >
-                <AlertCircle className="h-4 w-4 text-destructive flex-shrink-0" />
+                <AlertCircle className="h-4 w-4 text-destructive shrink-0" />
                 <p className="text-sm text-destructive">{error}</p>
               </motion.div>
             )}
@@ -174,14 +202,14 @@ export function AddWebsiteDialog({ onWebsiteAdded }: AddWebsiteDialogProps) {
           
           <DialogFooter className="p-6 pt-0 flex space-x-2">
             <DialogClose asChild ref={closeButtonRef}>
-              <Button variant="outline" className="flex-1">
+              <Button variant="outline" className="flex-1 bg-transparent border-white/10 text-white hover:bg-white/5">
                 Cancel
               </Button>
             </DialogClose>
             <Button 
               onClick={handleSubmit} 
               disabled={isSubmitting}
-              className="flex-1 bg-primary hover:bg-primary/90 transition-all duration-200"
+              className="flex-1 bg-[#4F6EF7] text-white hover:bg-[#3A58E0] transition-all duration-200 border-0"
             >
               {isSubmitting ? (
                 <div className="flex items-center space-x-2">

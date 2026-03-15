@@ -11,7 +11,8 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "@types/node": "^22.11.1"
+    "@types/node": "^22.11.1",
+    "@types/ws": "^8.5.14"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
@@ -19,8 +20,8 @@
   "dependencies": {
     "common": "workspace:*",
     "@solana/web3.js": "^1.95.7",
-    "axios": "^1.8.4",
     "tweetnacl": "^1.0.3",
-    "tweetnacl-util": "^0.15.1"
+    "tweetnacl-util": "^0.15.1",
+    "ws": "^8.18.2"
   }
 }

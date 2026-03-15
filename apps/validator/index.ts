@@ -1,174 +1,250 @@
-import { randomUUIDv7 } from "bun";
-import type { OutgoingMessage, SignupOutgoingMessage, ValidateOutgoingMessage } from "common/types";
-import { Keypair } from "@solana/web3.js";
-import nacl from "tweetnacl";
-import nacl_util from "tweetnacl-util";
-import WebSocket from "ws";
+import { randomUUIDv7 } from 'bun';
+import type { OutgoingMessage, SignupOutgoingMessage } from 'common/types';
+import { Keypair } from '@solana/web3.js';
+import WebSocket from 'ws';
+import { logger } from './logger.js';
+import { signMessage } from './crypto.js';
+import { PING_TIMEOUT_MS } from 'common/constants';
 
-const CALLBACKS: {[callbackId: string]: (data: SignupOutgoingMessage) => void} = {}
+// -------------------------------------------------------------------------
+// Configuration
+// -------------------------------------------------------------------------
+const HUB_URL = process.env.HUB_URL ?? 'ws://localhost:4001';
+const PING_INTERVAL_MS = 30_000;
 
+// -------------------------------------------------------------------------
+// State
+// -------------------------------------------------------------------------
 let validatorId: string | null = null;
 let ws: WebSocket | null = null;
+let keypair: Keypair;
+let reconnectAttempt = 0;
+let pingTimer: ReturnType<typeof setInterval> | null = null;
+let isShuttingDown = false;
 
-async function main() {
-    try {
-        const keypair = Keypair.fromSecretKey(
-            Uint8Array.from(JSON.parse(process.env.PRIVATE_KEY!))
-        );
-        
-        console.log("Connecting to hub server...");
-        ws = new WebSocket("ws://localhost:4001");
+// Cached public info resolved once on startup
+let publicIp = '127.0.0.1';
+let location = 'unknown';
 
-        ws.onmessage = async (event) => {
-            try {
-                const data: OutgoingMessage = JSON.parse(event.data.toString());
-                console.log(`Received message type: ${data.type}`);
-                
-                if (data.type === 'signup') {
-                    const callback = CALLBACKS[data.data.callbackId];
-                    if (callback) {
-                        callback(data.data);
-                        delete CALLBACKS[data.data.callbackId];
-                        console.log(`Successfully registered with validator ID: ${data.data.validatorId}`);
-                    } else {
-                        console.warn(`No callback found for signup callbackId: ${data.data.callbackId}`);
-                    }
-                } else if (data.type === 'validate') {
-                    console.log(`Received validate request for: ${data.data.url}`);
-                    await validateHandler(ws!, data.data, keypair);
-                } else {
-                    console.warn(`Received unknown message type: ${data.type}`);
-                }
-            } catch (error) {
-                console.error("Error handling message:", error);
-            }
-        };
+const CALLBACKS: Record<string, (data: SignupOutgoingMessage) => void> = {};
 
-        ws.onopen = async () => {
-            console.log("Connection established, sending signup request");
-            const callbackId = randomUUIDv7();
-            
-            CALLBACKS[callbackId] = (data: SignupOutgoingMessage) => {
-                validatorId = data.validatorId;
-                console.log(`Validator registered with ID: ${validatorId}`);
-            };
-            
-            // Fix: Match the exact format expected by the hub
-            const message = `Sign message for ${callbackId},${keypair.publicKey}`;
-            console.log(`Signing message: "${message}"`);
-            const signedMessage = await signMessage(message, keypair);
-
-            console.log("Sending signup request...");
-            ws!.send(JSON.stringify({
-                type: 'signup',
-                data: {
-                    callbackId,
-                    ip: '127.0.0.1',
-                    publicKey: keypair.publicKey.toString(),
-                    signedMessage,
-                },
-            }));
-        };
-        
-        ws.onerror = (error) => {
-            console.error("WebSocket error:", error);
-        };
-        
-        ws.onclose = () => {
-            console.log("Connection closed, attempting to reconnect in 5 seconds...");
-            ws = null;
-            setTimeout(() => main(), 5000);
-        };
-    } catch (error) {
-        console.error("Error in main function:", error);
-        setTimeout(() => main(), 5000);
+// -------------------------------------------------------------------------
+// Startup — detect public IP and location
+// -------------------------------------------------------------------------
+async function detectNodeInfo(): Promise<void> {
+  try {
+    const res = await fetch('https://ipapi.co/json/', {
+      signal: AbortSignal.timeout(5000),
+    });
+    if (res.ok) {
+      const data = (await res.json()) as { ip?: string; country_name?: string; city?: string };
+      publicIp = data.ip ?? '127.0.0.1';
+      location = [data.city, data.country_name].filter(Boolean).join(', ') || 'unknown';
+      logger.info(`Node info — IP: ${publicIp}, Location: ${location}`);
     }
+  } catch {
+    logger.warn('Could not detect public IP/location — using defaults');
+  }
 }
 
-async function validateHandler(ws: WebSocket, { url, callbackId, websiteId }: ValidateOutgoingMessage, keypair: Keypair) {
-    console.log(`Validating ${url}`);
-    const startTime = Date.now();
-    
-    // Fix: Use the correct message format
-    const signature = await signMessage(`Reply ${callbackId}`, keypair);
-
-    try {
-        console.log(`Sending request to ${url}`);
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-        
-        const response = await fetch(url, { 
-            signal: controller.signal 
-        });
-        clearTimeout(timeout);
-        
-        const endTime = Date.now();
-        const latency = endTime - startTime;
-        const status = response.status;
-
-        console.log(`${url} - Status: ${status}, Latency: ${latency}ms`);
-        
-        if (!validatorId) {
-            console.error("Cannot send validation result: validatorId is not set");
-            return;
-        }
-        
-        ws.send(JSON.stringify({
-            type: 'validate',
-            data: {
-                callbackId,
-                status: status >= 200 && status < 300 ? 'UP' : 'DOWN',
-                latency,
-                websiteId,
-                validatorId,
-                signedMessage: signature,
-            },
-        }));
-    } catch (error) {
-        console.error(`Error checking ${url}:`, error);
-        
-        if (!validatorId) {
-            console.error("Cannot send validation result: validatorId is not set");
-            return;
-        }
-        
-        ws.send(JSON.stringify({
-            type: 'validate',
-            data: {
-                callbackId,
-                status: 'DOWN',
-                latency: 1000,
-                websiteId,
-                validatorId,
-                signedMessage: signature,
-            },
-        }));
-    }
+// -------------------------------------------------------------------------
+// Exponential backoff reconnect
+// -------------------------------------------------------------------------
+function getReconnectDelay(): number {
+  const base = 5_000;
+  const max = 60_000;
+  const delay = Math.min(base * 2 ** reconnectAttempt, max);
+  reconnectAttempt += 1;
+  return delay;
 }
 
-async function signMessage(message: string, keypair: Keypair) {
-    try {
-        console.log(`Signing message: "${message}"`);
-        const messageBytes = nacl_util.decodeUTF8(message);
-        const signature = nacl.sign.detached(messageBytes, keypair.secretKey);
-        const signatureString = JSON.stringify(Array.from(signature));
-        console.log(`Generated signature of length: ${signature.length}`);
-        return signatureString;
-    } catch (error) {
-        console.error("Error signing message:", error);
-        throw error;
-    }
+function resetReconnectDelay(): void {
+  reconnectAttempt = 0;
 }
 
-main();
-
-// Implement heartbeat functionality to keep the connection alive
-setInterval(async () => {
+// -------------------------------------------------------------------------
+// Ping — real WS-level ping to detect dead hub connection
+// -------------------------------------------------------------------------
+function startPing(): void {
+  stopPing();
+  pingTimer = setInterval(() => {
     if (ws && ws.readyState === WebSocket.OPEN) {
-        console.log(`Validator status: Active${validatorId ? ` (ID: ${validatorId})` : ''}`);
-    } else if (ws) {
-        console.log(`Validator status: Connection state - ${ws.readyState}`);
-    } else {
-        console.log("Validator status: Disconnected, waiting to reconnect");
+      ws.ping();
+      logger.debug('Sent WS ping to hub');
     }
-}, 10000);
+  }, PING_INTERVAL_MS);
+}
+
+function stopPing(): void {
+  if (pingTimer) {
+    clearInterval(pingTimer);
+    pingTimer = null;
+  }
+}
+
+// -------------------------------------------------------------------------
+// Validate handler
+// -------------------------------------------------------------------------
+async function validateHandler(
+  socket: WebSocket,
+  { url, callbackId, websiteId }: { url: string; callbackId: string; websiteId: string },
+): Promise<void> {
+  logger.info(`Checking ${url} (callbackId: ${callbackId})`);
+
+  const startTime = Date.now();
+  const signature = await signMessage(`Reply ${callbackId}`, keypair);
+
+  let status: 'UP' | 'DOWN' = 'DOWN';
+  let latency: number | null = null;
+
+  try {
+    const response = await fetch(url, {
+      signal: AbortSignal.timeout(PING_TIMEOUT_MS),
+    });
+    latency = Date.now() - startTime;
+    status = response.status >= 200 && response.status < 300 ? 'UP' : 'DOWN';
+    logger.info(`${url} → ${status} (${latency}ms)`);
+  } catch (err) {
+    // latency stays null on timeout/network error
+    logger.warn(`${url} → DOWN (error: ${err instanceof Error ? err.message : String(err)})`);
+  }
+
+  if (!validatorId) {
+    logger.error('Cannot send result — validatorId not set yet');
+    return;
+  }
+
+  socket.send(
+    JSON.stringify({
+      type: 'validate',
+      data: { callbackId, status, latency, websiteId, validatorId, signedMessage: signature },
+    }),
+  );
+}
+
+// -------------------------------------------------------------------------
+// Main connection loop
+// -------------------------------------------------------------------------
+async function connect(): Promise<void> {
+  if (isShuttingDown) return;
+
+  logger.info(`Connecting to hub at ${HUB_URL} (attempt ${reconnectAttempt + 1})`);
+  ws = new WebSocket(HUB_URL);
+
+  ws.onopen = async () => {
+    logger.info('Connected to hub — sending signup');
+    resetReconnectDelay();
+    startPing();
+
+    const callbackId = randomUUIDv7();
+    CALLBACKS[callbackId] = (data: SignupOutgoingMessage) => {
+      validatorId = data.validatorId;
+      logger.info(`Registered as validator ID: ${validatorId}`);
+    };
+
+    const message = `Sign message for ${callbackId},${keypair.publicKey}`;
+    const signedMessage = await signMessage(message, keypair);
+
+    ws!.send(
+      JSON.stringify({
+        type: 'signup',
+        data: {
+          callbackId,
+          ip: publicIp,
+          publicKey: keypair.publicKey.toString(),
+          signedMessage,
+          location,
+        },
+      }),
+    );
+  };
+
+  ws.onmessage = async (event) => {
+    let data: OutgoingMessage;
+    try {
+      data = JSON.parse(event.data.toString()) as OutgoingMessage;
+    } catch {
+      logger.error('Failed to parse message from hub');
+      return;
+    }
+
+    if (data.type === 'signup') {
+      const cb = CALLBACKS[data.data.callbackId];
+      if (cb) {
+        cb(data.data);
+        delete CALLBACKS[data.data.callbackId];
+      } else {
+        logger.warn(`No signup callback for callbackId: ${data.data.callbackId}`);
+      }
+    } else if (data.type === 'validate') {
+      // Run validation asynchronously without blocking the WebSocket
+      validateHandler(ws!, data.data).catch((err) => {
+        logger.error(`Validation failed completely: ${err}`);
+      });
+    } else {
+      logger.warn(`Unknown message type from hub`);
+    }
+  };
+
+  ws.onerror = (err) => {
+    logger.error('WebSocket error', err.message);
+  };
+
+  ws.onclose = (event) => {
+    stopPing();
+    ws = null;
+
+    if (isShuttingDown) {
+      logger.info('Connection closed (shutdown)');
+      return;
+    }
+
+    const delay = getReconnectDelay();
+    logger.warn(
+      `Disconnected (code: ${event.code}) — reconnecting in ${delay / 1000}s (attempt ${reconnectAttempt})`,
+    );
+    setTimeout(connect, delay);
+  };
+}
+
+// -------------------------------------------------------------------------
+// Graceful shutdown
+// -------------------------------------------------------------------------
+function shutdown(signal: string): void {
+  logger.info(`Received ${signal} — shutting down`);
+  isShuttingDown = true;
+  stopPing();
+
+  if (ws) {
+    ws.close(1000, 'Validator shutting down');
+  }
+
+  // Give the WS time to close cleanly
+  setTimeout(() => process.exit(0), 1000);
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
+
+// -------------------------------------------------------------------------
+// Entry point
+// -------------------------------------------------------------------------
+async function main(): Promise<void> {
+  if (!process.env.PRIVATE_KEY) {
+    logger.error('PRIVATE_KEY environment variable is required');
+    process.exit(1);
+  }
+
+  keypair = Keypair.fromSecretKey(
+    Uint8Array.from(JSON.parse(process.env.PRIVATE_KEY)),
+  );
+  logger.info(`Validator public key: ${keypair.publicKey.toString()}`);
+
+  await detectNodeInfo();
+  await connect();
+}
+
+main().catch((err) => {
+  logger.error('Fatal startup error', err);
+  process.exit(1);
+});

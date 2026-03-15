@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    name: Type Check · Lint · Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.18
+
+      - name: Cache Turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Prisma generate must run before type-check/build so the
+      # generated client types are available to all dependent packages.
+      - name: Generate Prisma client
+        run: bun run db:generate
+        env:
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/uptimecheck"
+
+      - name: Type check
+        run: bun run check-types
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Build
+        run: bun run build
+        env:
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/uptimecheck"
+          # Clerk keys: placeholder values satisfy the Next.js build-time env check
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_test_placeholder_for_ci_do_not_use"
+          CLERK_SECRET_KEY: "sk_test_placeholder_for_ci_do_not_use"
+          NEXT_PUBLIC_BACKEND_URL: "http://localhost:4000"

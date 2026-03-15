@@ -102,6 +102,10 @@ temp/
 *.sln
 *.sw?
 
+# Local AI/agent metadata
+.agent/
+.agents/
+
 # MacOS
 .AppleDouble
 .LSOverride

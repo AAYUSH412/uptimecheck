@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,16 +11,26 @@ datasource db {
 }
 
 model User {
-  id    String @id @default(uuid())
-  email String @unique
+  id        String   @id @default(uuid())
+  email     String   @unique
+  /// Timestamp when the user account was created
+  createdAt DateTime @default(now())
 }
 
 model Website {
-  id       String        @id @default(uuid())
-  url      String
-  userId   String
-  ticks    WebsiteTick[]
-  disabled Boolean       @default(false)
+  id                   String        @id @default(uuid())
+  /// Optional friendly display name for the website
+  name                 String?
+  url                  String
+  /// Clerk user ID — not a DB foreign key (Clerk manages identity externally)
+  userId               String
+  ticks                WebsiteTick[]
+  disabled             Boolean       @default(false)
+  /// How often this website should be checked, in seconds
+  checkIntervalSeconds Int           @default(60)
+
+  @@index([userId])
+  @@unique([userId, url])
 }
 
 model Validator {
@@ -33,17 +40,22 @@ model Validator {
   ip            String
   pendingPayout Int           @default(0)
   ticks         WebsiteTick[]
+
+  @@index([publickey])
 }
 
 model WebsiteTick {
   id          String        @id @default(uuid())
   websiteId   String
   validatorId String
-  createdAt   DateTime
+  createdAt   DateTime      @default(now())
   status      WebsiteStatus
-  latency     Float
+  /// Response latency in milliseconds. Null when the request timed out or errored.
+  latency     Float?
   website     Website       @relation(fields: [websiteId], references: [id])
   validator   Validator     @relation(fields: [validatorId], references: [id])
+
+  @@index([websiteId, createdAt])
 }
 
 enum WebsiteStatus {

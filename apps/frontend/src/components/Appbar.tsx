@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   SignInButton,
@@ -11,58 +12,31 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { 
-  ActivitySquare, 
   Menu, 
-  X, 
+  X,
   LayoutDashboard,
-  Search,
-  Github,
-  Linkedin,
-  ExternalLink,
-  Star,
-  Code
+  ChevronRight
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Input } from "./ui/input";
 
 export function Appbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   
-  // Navigation items for better organization
   const navItems = [
-    { name: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
-    { name: "Features", href: "#features", icon: <Star className="h-4 w-4" /> },
-    { name: "About", href: "#about", icon: <Code className="h-4 w-4" /> },
+    { name: "Features", href: "/#features" },
+    { name: "Pricing", href: "/pricing" },
+    { name: "Status", href: "/status" },
+    { name: "Demo", href: "/demo/dashboard" },
+    { name: "Docs", href: "/docs" },
   ];
 
-  // Social links
-  const socialLinks = [
-    { 
-      name: "GitHub", 
-      href: "https://github.com/AAYUSH412", 
-      icon: <Github className="h-4 w-4" />,
-      color: "hover:text-gray-300"
-    },
-    { 
-      name: "LinkedIn", 
-      href: "https://www.linkedin.com/in/aayush-vaghela/", 
-      icon: <Linkedin className="h-4 w-4" />,
-      color: "hover:text-blue-400"
-    },
-    { 
-      name: "Portfolio", 
-      href: "https://aayush-vaghela.vercel.app/", 
-      icon: <ExternalLink className="h-4 w-4" />,
-      color: "hover:text-purple-400"
-    },
-  ];
-
-  // Handle scroll effect - make navbar transparent or solid
   useEffect(() => {
+    setMounted(true);
     if (typeof window === 'undefined') return;
     
     const handleScroll = () => {
@@ -77,107 +51,84 @@ export function Appbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  if (pathname?.startsWith("/dashboard") || pathname?.startsWith("/demo/dashboard")) return null;
+  if (!mounted) return null; // Avoid hydration mismatch on the navbar
+
   return (
-    <motion.nav 
-      initial={{ y: -10, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className={cn(
-      "sticky top-0 z-50 transition-all duration-200 backdrop-blur-md",
-      scrolled 
-        ? "bg-500/95 border-b border-border shadow-sm" 
-        : "bg-500/50 border-b border-transparent"
-      )}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo and site name */}
+    <div className="fixed top-0 inset-x-0 z-50 pointer-events-none">
+      <motion.nav 
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        className={cn(
+          "w-full transition-all duration-300 border-b pointer-events-auto",
+          scrolled 
+            ? "bg-[#0A0A0F]/80 backdrop-blur-md border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] py-3" 
+            : "bg-transparent border-transparent py-5"
+        )}
+      >
+        <div className="max-w-7xl mx-auto px-6 md:px-8 flex items-center justify-between">
+          {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center gap-2">
-              <motion.div
-                whileHover={{ rotate: [0, -10, 10, -10, 0] }}
-                transition={{ duration: 0.5 }}
-              >
-                <ActivitySquare className="h-8 w-8 text-primary" />
-              </motion.div>
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-400">UptimeCheck</span>
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="bg-linear-to-tr from-[#4F6EF7]/20 to-[#4F6EF7]/5 p-1 rounded-xl border border-[#4F6EF7]/30 group-hover:border-[#4F6EF7]/60 group-hover:shadow-[0_0_15px_rgba(79,110,247,0.3)] transition-all">
+                <Image src="/favicon/apple-touch-icon.png" alt="Logo" width={20} height={20} className="w-5 h-5 object-contain" />
+              </div>
+              <span className="text-lg font-bold text-white tracking-tight hidden sm:block group-hover:text-[#4F6EF7] transition-colors">UptimeCheck</span>
             </Link>
           </div>
 
-          {/* Desktop nav */}
-          <div className="hidden md:flex items-center space-x-1">
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center justify-center absolute left-1/2 -translate-x-1/2 space-x-2">
             {navItems.map((item) => (
               <Link 
                 key={item.name} 
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                  "px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
                   pathname === item.href
-                    ? "bg-primary/10 text-primary"
-                    : "text-foreground/70 hover:text-foreground hover:bg-secondary/60"
+                    ? "text-white bg-white/10 border border-white/5"
+                    : "text-[#8888A8] hover:text-white hover:bg-white/5 border border-transparent"
                 )}
               >
-                {item.icon}
-                <span>{item.name}</span>
+                {item.name}
               </Link>
             ))}
           </div>
 
-          {/* Right side - social links and auth */}
-          <div className="hidden md:flex items-center gap-3">
-            {/* Social Links */}
-            <div className="flex items-center gap-2 mr-2">
-              {socialLinks.map((link) => (
-                <motion.a
-                  key={link.name}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={cn(
-                    "p-2 rounded-full text-muted-foreground transition-all duration-200",
-                    "hover:bg-secondary/60 hover:scale-110",
-                    link.color
-                  )}
-                  whileHover={{ y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  title={link.name}
-                >
-                  {link.icon}
-                </motion.a>
-              ))}
-            </div>
-            
-            {/* Auth buttons */}
-            <SignedOut>
-              <div className="flex items-center gap-2">
-                <SignInButton
-                appearance={{
-                  elements: {
-                    formButtonPrimary: 'bg-black-500 hover:bg-slate-400 text-sm',
-                  },
-                }}
-                 mode="modal">
-                  <Button variant="ghost" size="sm" className="rounded-full">Sign In</Button>
-                </SignInButton>
-                <SignUpButton mode="modal">
-                  <Button size="sm" className="rounded-full bg-gradient-to-r from-blue-600 to-blue-400 hover:from-blue-700 hover:to-blue-500">
-                    Get Started
-                  </Button>
-                </SignUpButton>
-              </div>
-            </SignedOut>
+          {/* Right side - Auth */}
+          <div className="hidden md:flex items-center gap-4">
             <SignedIn>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link href="/dashboard">
+                <Button variant="ghost" className="text-[#8888A8] hover:text-white hover:bg-white/10 rounded-full h-9">
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  Dashboard
+                </Button>
+              </Link>
+              <div className="border-l border-white/10 pl-4">
                 <UserButton 
                   afterSignOutUrl="/"
                   appearance={{
                     elements: {
-                      userButtonAvatarBox: "h-9 w-9"
+                      userButtonAvatarBox: "h-8 w-8 ring-1 ring-white/20 hover:ring-[#4F6EF7]/50 transition-all"
                     }
                   }}
                 />
-              </motion.div>
+              </div>
             </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button variant="ghost" className="text-[#8888A8] hover:text-white hover:bg-white/5 rounded-full font-medium h-9">
+                  Log in
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <Button className="rounded-full bg-white text-black hover:bg-white/90 font-medium h-9 px-5 shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)] transition-all group">
+                  Start Monitoring
+                  <ChevronRight className="h-4 w-4 ml-1 opacity-50 group-hover:translate-x-0.5 group-hover:opacity-100 transition-all" />
+                </Button>
+              </SignUpButton>
+            </SignedOut>
           </div>
           
           {/* Mobile menu button */}
@@ -185,141 +136,80 @@ export function Appbar() {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="rounded-full" 
+              className="text-[#8888A8] hover:text-white hover:bg-white/5 rounded-full" 
               onClick={() => setIsOpen(!isOpen)}
-              aria-label="Toggle menu"
             >
               {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
-      </div>
 
-      {/* Mobile menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div 
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden bg-background border-t border-border overflow-hidden"
-          >
-            {/* Search Bar Mobile */}
-            <div className="p-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search..."
-                  className="pl-9 w-full bg-secondary/50"
-                />
+        {/* Mobile menu */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden border-t border-white/10 overflow-hidden bg-[#0A0A0F]/95 backdrop-blur-3xl -mt-px pointer-events-auto"
+            >
+              <div className="px-6 py-6 space-y-2">
+                {navItems.map((item) => (
+                  <Link 
+                    key={item.name} 
+                    href={item.href} 
+                    className={cn(
+                      "block px-4 py-3 rounded-xl text-base font-medium transition-colors",
+                      pathname === item.href
+                        ? "bg-white/10 text-white border border-white/5"
+                        : "text-[#8888A8] hover:text-white hover:bg-white/5 border border-transparent"
+                    )}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
               </div>
-            </div>
-            
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              {navItems.map((item) => (
-                <Link 
-                  key={item.name} 
-                  href={item.href} 
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-md text-base font-medium transition-colors",
-                    pathname === item.href
-                      ? "bg-primary/10 text-primary"
-                      : "text-foreground/70 hover:text-foreground hover:bg-secondary/60"
-                  )}
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item.icon}
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-            
-            <div className="pt-4 pb-5 border-t border-border">
-              <div className="px-5">
+              
+              <div className="px-6 pt-2 pb-8">
                 <SignedOut>
-                  <div className="flex flex-col space-y-3 w-full">
+                  <div className="flex flex-col space-y-3">
                     <SignInButton mode="modal">
-                      <Button variant="outline" className="w-full justify-center cursor-auto">
-                        Sign In
+                      <Button variant="outline" className="w-full rounded-xl border-white/10 hover:bg-white/5 text-white h-11">
+                        Log in
                       </Button>
                     </SignInButton>
                     <SignUpButton mode="modal">
-                      <Button className="w-full justify-center bg-gradient-to-r from-blue-600 to-blue-400 cursor-auto">
-                        Create Account
+                      <Button className="w-full rounded-xl bg-white text-black hover:bg-white/90 h-11 font-medium">
+                        Start Monitoring FREE
                       </Button>
                     </SignUpButton>
                   </div>
                 </SignedOut>
                 <SignedIn>
-                  <div className="flex items-center gap-3 px-1 py-2">
+                  <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
+                    <Link href="/dashboard" onClick={() => setIsOpen(false)}>
+                      <Button variant="ghost" className="text-white hover:bg-white/10 rounded-lg">
+                        <LayoutDashboard className="h-4 w-4 mr-2" />
+                        Go to Dashboard
+                      </Button>
+                    </Link>
                     <UserButton 
                       afterSignOutUrl="/"
                       appearance={{
                         elements: {
-                          userButtonAvatarBox: "h-10 w-10"
+                          userButtonAvatarBox: "h-9 w-9 ring-2 ring-[#4F6EF7]/30"
                         }
                       }}
                     />
-                    <div className="flex flex-col">
-                      <span className="font-medium">User Account</span>
-                      <span className="text-sm text-muted-foreground">Manage your account</span>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-3 pt-3 border-t border-border">
-                    <div className="flex items-center gap-3 px-1 py-2">
-                      {socialLinks.map((link) => (
-                        <motion.a
-                          key={link.name}
-                          href={link.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={cn(
-                            "p-2 rounded-full text-muted-foreground transition-all duration-200",
-                            "hover:bg-secondary/60",
-                            link.color
-                          )}
-                          whileHover={{ y: -2 }}
-                          whileTap={{ scale: 0.95 }}
-                          title={link.name}
-                          onClick={() => setIsOpen(false)}
-                        >
-                          {link.icon}
-                        </motion.a>
-                      ))}
-                    </div>
                   </div>
                 </SignedIn>
               </div>
-            </div>
-            
-            {/* App info in mobile menu */}
-            <div className="border-t border-border px-5 py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-1.5">
-                  <ActivitySquare className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">UptimeCheck v1.0</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  {socialLinks.slice(0, 2).map((link) => (
-                    <motion.a
-                      key={link.name}
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-1.5 rounded-full text-muted-foreground hover:bg-secondary/60 transition-colors"
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      {link.icon}
-                    </motion.a>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.nav>
+    </div>
   );
 }

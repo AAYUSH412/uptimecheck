@@ -1,20 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  eslint: {
-    // Disable ESLint during builds for now
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    // Disable TypeScript type checking during builds for faster deployment
-    ignoreBuildErrors: true,
-  },
-  experimental: {
-    turbo: {
-      // Optimize turbo configuration
-      resolveAlias: {
-        "@": "./src",
-      },
+  outputFileTracingRoot: require("path").join(__dirname, "../../"),
+  turbopack: {
+    // Optimize turbopack configuration
+    resolveAlias: {
+      "@": "./src",
     },
   },
   images: {

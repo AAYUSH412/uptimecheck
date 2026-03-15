@@ -1,55 +1,80 @@
-# Database Package
+# 🗄 @uptime/db
 
-The `db` package provides database access and schema management for the UptimeCheck monitoring platform. Built with Prisma ORM and PostgreSQL, it handles all data persistence for websites, validators, users, and monitoring ticks.
+Centralized PostgreSQL database layer for UptimeCheck using Prisma ORM. Manages schema, migrations, and data access for all services.
 
-## 📋 Overview
+## 🎯 Purpose
 
-This package contains the Prisma schema, database client, migrations, and seeding functionality. It serves as the central data layer for all UptimeCheck services.
+The `db` package provides:
+- **Unified Schema**: Single source of truth for data structure
+- **Type-safe Client**: Auto-generated Prisma Client
+- **Migrations**: Version-controlled database changes
+- **Seeding**: Initial data population for development
+- **Studio**: GUI for data exploration and manipulation
 
-## 🗃️ Database Schema
+All other services import from this package to access the database.
 
-### **User**
+## 🗂 Data Model
+
+### User
+Represents a platform user (managed by Clerk, not a local auth table).
+
 ```prisma
 model User {
-  id    String @id @default(uuid())
-  email String @unique
+  id        String   @id @default(uuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
 }
 ```
 
-### **Website**
+### Website
+A URL that is being monitored.
+
 ```prisma
 model Website {
-  id       String        @id @default(uuid())
-  url      String        # Website URL to monitor
-  userId   String        # Owner of the website
-  ticks    WebsiteTick[] # Monitoring history
-  disabled Boolean       @default(false)
+  id                   String       @id @default(uuid())
+  name                 String?      // Optional friendly name
+  url                  String       // The URL to monitor
+  userId               String       // Clerk user ID
+  disabled             Boolean      @default(false)
+  checkIntervalSeconds Int          @default(60)
+  ticks                WebsiteTick[] // Associated check results
+  
+  @@unique([userId, url]) // User can't monitor same URL twice
+  @@index([userId])
 }
 ```
 
-### **Validator**
+### Validator
+A distributed worker node performing uptime checks globally.
+
 ```prisma
 model Validator {
-  id            String        @id @default(uuid())
-  publickey     String        # Solana public key for authentication
-  location      String        # Geographic location
-  ip            String        # IP address
-  pendingPayout Int           @default(0) # Pending rewards in lamports
-  ticks         WebsiteTick[] # Validation history
+  id            String       @id @default(uuid())
+  publickey     String       // Ed25519 public key (Solana style)
+  location      String       // City/Country where it runs
+  ip            String       // Public IP address
+  pendingPayout Int          @default(0)
+  ticks         WebsiteTick[] // Results submitted by this validator
+  
+  @@index([publickey])
 }
 ```
 
-### **WebsiteTick**
+### WebsiteTick
+Individual check result (UP/DOWN + latency).
+
 ```prisma
 model WebsiteTick {
   id          String        @id @default(uuid())
-  websiteId   String        # Reference to monitored website
-  validatorId String        # Validator that performed the check
-  createdAt   DateTime      # Timestamp of the check
-  status      WebsiteStatus # UP or DOWN
-  latency     Float         # Response time in milliseconds
-  website     Website       @relation(fields: [websiteId], references: [id])
-  validator   Validator     @relation(fields: [validatorId], references: [id])
+  websiteId   String
+  validatorId String
+  createdAt   DateTime      @default(now())
+  status      WebsiteStatus // UP or DOWN
+  latency     Float?        // Response time in ms (null if timeout)
+  website     Website       @relation(...)
+  validator   Validator     @relation(...)
+  
+  @@index([websiteId, createdAt])
 }
 
 enum WebsiteStatus {
@@ -58,117 +83,250 @@ enum WebsiteStatus {
 }
 ```
 
-## 🚀 Getting Started
+## 📊 Relationships
 
-### Prerequisites
-- PostgreSQL database running
-- Environment variables configured
-
-### Setup
-```bash
-# Install dependencies
-bun install
-
-# Set up environment variables
-echo 'DATABASE_URL="postgresql://postgres:password@localhost:5432/uptimecheck"' > .env
-
-# Generate Prisma client
-bunx prisma generate
-
-# Run migrations
-bunx prisma migrate dev
-
-# (Optional) Seed the database
-bun run seed
+```mermaid
+erDiagram
+    USER ||--o{ WEBSITE : manages
+    WEBSITE ||--o{ WEBSITETICK : "has history"
+    VALIDATOR ||--o{ WEBSITETICK : "performs"
+    
+    USER {
+        string id
+        string email
+        datetime createdAt
+    }
+    
+    WEBSITE {
+        string id
+        string name
+        string url
+        string userId
+        boolean disabled
+        int checkIntervalSeconds
+    }
+    
+    VALIDATOR {
+        string id
+        string publickey
+        string location
+        string ip
+        int pendingPayout
+    }
+    
+    WEBSITETICK {
+        string id
+        string websiteId
+        string validatorId
+        datetime createdAt
+        enum status
+        float latency
+    }
 ```
 
-## 🔧 Available Scripts
+## 🔧 Setup
 
-### **Database Migrations**
-```bash
-# Create and apply a new migration
-bunx prisma migrate dev --name your_migration_name
+### 1. Environment Variables
 
-# Reset database (⚠️ Development only)
-bunx prisma migrate reset
+Create `.env`:
 
-# Check migration status
-bunx prisma migrate status
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/uptimecheck"
 ```
 
-### **Prisma Client**
-```bash
-# Regenerate client after schema changes
-bunx prisma generate
+### 2. Generate Prisma Client
 
-# Open Prisma Studio for visual database management
-bunx prisma studio
+```bash
+bun run db:generate
 ```
 
-### **Database Seeding**
+This creates `node_modules/.prisma/client` with TypeScript types.
+
+### 3. Create/Update Schema
+
+**For Development** (quick prototyping):
 ```bash
-# Run the seed script
-bun run seed
+bun run db:push
+```
+Applies schema changes directly (⚠️ may lose data).
+
+**For Production** (safe migrations):
+```bash
+bun run db:migrate
+```
+Creates proper migration files in `prisma/migrations/`.
+
+### 4. Seed Initial Data
+
+```bash
+bun run db:seed
 ```
 
-## 💻 Usage in Services
+Runs `seed.ts` to populate test data.
 
-### Import Database Client
+## 💻 Usage in Other Services
+
+### Import Prisma Client
+
 ```typescript
-import { prismaclient } from "db/client";
+import { prismaclient } from 'db/client';
 
-// Example: Create a new website
-const website = await prismaclient.website.create({
+// Query
+const websites = await prismaclient.website.findMany({
+  where: { userId: 'clerk-user-123' }
+});
+
+// Create
+const newWebsite = await prismaclient.website.create({
   data: {
-    url: "https://example.com",
-    userId: "user-uuid",
-    disabled: false
+    url: 'https://example.com',
+    userId: 'clerk-user-123',
+    checkIntervalSeconds: 60
   }
 });
 
-// Example: Get website monitoring data
-const ticks = await prismaclient.websiteTick.findMany({
-  where: { websiteId: "website-uuid" },
-  include: { validator: true },
-  orderBy: { createdAt: 'desc' },
-  take: 100
+// Update
+await prismaclient.website.update({
+  where: { id: 'web-123' },
+  data: { disabled: true }
+});
+
+// Delete
+await prismaclient.website.delete({
+  where: { id: 'web-123' }
 });
 ```
 
-## 🏗️ Architecture Role
+### Transaction Support
 
-The database package serves as the data persistence layer for:
-- **API Service**: CRUD operations for websites and users
-- **Hub Service**: Validator registration and tick storage
-- **Validator Service**: Reading website configurations
-- **Frontend**: Displaying monitoring data and analytics
+```typescript
+await prismaclient.$transaction(async (tx) => {
+  const website = await tx.website.create({...});
+  const tick = await tx.websiteTick.create({...});
+  return { website, tick };
+});
+```
 
-## 📊 Key Operations
+## 🖥 Database Studio
 
-### **Website Management**
-- Add/remove websites to monitor
-- Enable/disable monitoring for specific sites
-- Track website ownership by users
+Open interactive GUI:
 
-### **Validator Operations**
-- Register new validators with public keys
-- Track validator performance and payouts
-- Maintain validator location and IP information
+```bash
+bun run db:studio
+```
 
-### **Monitoring Data**
-- Store uptime check results (ticks)
-- Track response times and status changes
-- Maintain historical monitoring data
+Opens `http://localhost:5555` for:
+- Browsing tables
+- Editing records
+- Running queries
+- Monitoring performance
 
-## 🔒 Security Features
+## 📜 Migration History
 
-- **UUID Primary Keys**: All models use UUIDs for security
-- **Cryptographic Authentication**: Validators use Solana keypairs
-- **User Isolation**: Websites are tied to specific user accounts
+```
+prisma/migrations/
+├── 20250325092309_init/           # Initial schema
+├── 20250325101504_add_disabled/   # Added disabled field
+└── 20250331064059_add_payout/     # Added pendingPayout
+```
 
-## 🔗 Related Services
+View migration status:
+```bash
+bun run db:status
+```
 
-- [`api`](../apps/api/README.md) - REST API that uses this database client
-- [`hub`](../apps/hub/README.md) - WebSocket hub that stores validation results
-- [`common`](../common/README.md) - Shared types and interfaces
-- [`frontend`](../apps/frontend/README.md) - UI that displays database data
+## 🧪 Testing
+
+Reset database for testing:
+
+```bash
+bun run db:reset
+```
+
+This:
+1. Drops all tables
+2. Recreates from schema
+3. Runs seed.ts
+
+⚠️ **Destructive** — only use in development!
+
+## 📊 Common Queries
+
+### Get Uptime Percentage
+
+```typescript
+const ticks = await prismaclient.websiteTick.findMany({
+  where: {
+    websiteId: 'web-123',
+    createdAt: {
+      gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // Last 7 days
+    }
+  }
+});
+
+const uptime = (ticks.filter(t => t.status === 'UP').length / ticks.length) * 100;
+```
+
+### Get Average Latency
+
+```typescript
+const ticks = await prismaclient.websiteTick.findMany({
+  where: { websiteId: 'web-123' }
+});
+
+const avgLatency = ticks.reduce((sum, t) => sum + (t.latency || 0), 0) / ticks.length;
+```
+
+### Get Top Validators
+
+```typescript
+const topValidators = await prismaclient.validator.findMany({
+  include: {
+    _count: { select: { ticks: true } }
+  },
+  orderBy: { _count: { ticks: 'desc' } },
+  take: 10
+});
+```
+
+## 🚨 Troubleshooting
+
+### Migration Failed
+```bash
+bun run db:migrate:dev --name fix_schema
+```
+
+### Can't Connect to DB
+```bash
+# Verify connection string
+echo $DATABASE_URL
+
+# Test connection
+bun run db:push --force
+```
+
+### Lost Type Information
+```bash
+bun run db:generate
+```
+
+Re-generates Prisma Client types.
+
+## 📚 Resources
+
+- [Prisma Docs](https://www.prisma.io/docs)
+- [PostgreSQL Tutorial](https://www.postgresql.org/docs)
+- [SQL Query Optimization](https://www.postgresql.org/docs/current/performance.html)
+
+## 🤝 Contributing
+
+When modifying schema:
+1. Make changes in `schema.prisma`
+2. Create migration: `bun run db:migrate:dev --name <name>`
+3. Update seed if needed
+4. Update documentation
+5. Test with `bun run db:reset`
+
+## 📄 License
+
+MIT

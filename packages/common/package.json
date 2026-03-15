@@ -4,12 +4,18 @@
   "module": "index.ts",
   "type": "module",
   "exports": {
-    "./types": "./index.ts"
+    "./types": "./index.ts",
+    "./constants": "./constants.ts",
+    "./errors": "./errors.ts",
+    "./schemas": "./schemas.ts"
   },
   "scripts": {
     "build": "tsc",
     "lint": "eslint .",
     "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.24.0"
   },
   "devDependencies": {
     "@types/bun": "latest",

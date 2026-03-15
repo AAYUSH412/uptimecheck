@@ -1,6 +1,5 @@
-export * from './mockData'
+export * from './types'
 export { DashboardOverview } from "./DashboardOverview"
-export { WebsiteDetail } from "./WebsiteDetail"
 export { WebsiteNavigation } from "./WebsiteNavigation"
 export { WebsiteSidebar } from "./WebsiteSidebar"
 export { AddWebsiteDialog } from "./AddWebsiteDialog"

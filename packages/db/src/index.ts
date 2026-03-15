@@ -1,3 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
-export const prismaclient = new PrismaClient();
+const isDev = process.env.NODE_ENV !== 'production';
+
+export const prismaclient = new PrismaClient({
+  log: isDev ? ['warn', 'error'] : ['error'],
+});

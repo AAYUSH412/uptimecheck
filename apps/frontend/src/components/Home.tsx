@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 
 // Dynamic imports for better code splitting and performance
 const Hero = dynamic(() => import("./landing/Hero"), {
-  loading: () => <div className="h-screen bg-gradient-to-b from-background to-muted animate-pulse" />
+  loading: () => <div className="h-screen bg-linear-to-b from-background to-muted animate-pulse" />
 });
 
 const Features = dynamic(() => import("./landing/Features"), {
@@ -78,7 +78,7 @@ export default function Home() {
   return (
     <ErrorBoundary>
       <div className="relative overflow-hidden">
-        <Suspense fallback={<div className="h-screen bg-gradient-to-b from-background to-muted animate-pulse" />}>
+        <Suspense fallback={<div className="h-screen bg-linear-to-b from-background to-muted animate-pulse" />}>
           <Hero />
         </Suspense>
         

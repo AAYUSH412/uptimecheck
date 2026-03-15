@@ -1,15 +1,12 @@
-# Validator Service
+# ⚡ UptimeCheck Validator
 
-The Validator service is a distributed worker that performs actual website monitoring for the UptimeCheck platform. Validators connect to the Hub via WebSocket, receive monitoring tasks, check website availability, and report results back with cryptographic signatures for authenticity.
+A lightweight distributed worker node that performs actual uptime checks. Validators connect to the Hub, verify their identity cryptographically, and execute assigned monitoring tasks from various geographic locations.
 
-## 📋 Overview
+## 🌍 Role
 
-Validators are the distributed workforce of UptimeCheck that:
-- Connect to the Hub service for task coordination
-- Perform HTTP requests to check website availability
-- Measure response times and detect outages
-- Report results with cryptographic signatures
-- Earn rewards for successful monitoring participation
+- **Distributed Monitoring**: Deploy in multiple regions to check global availability
+- **Secure**: Uses Ed25519 keypairs (Solana style) for identity and reputation
+- **Reporting**: Measures latency and status, reporting back to Hub with cryptographic proofs
 
 ## 🚀 Getting Started
 

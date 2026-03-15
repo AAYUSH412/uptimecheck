@@ -244,7 +244,7 @@ export default function Dashboard() {
             <div className="inline-flex items-center gap-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-purple-200 shadow-lg">
               <div className="flex items-center gap-2">
                 <Globe className="h-5 w-5 text-purple-600" />
-                <span className="text-gray-700 font-medium">50+ Global Monitoring Locations</span>
+                <span className="text-gray-700 font-medium">Globally Distributed Validator Network</span>
               </div>
               <div className="h-6 w-px bg-gray-300"></div>
               <div className="flex items-center gap-2">

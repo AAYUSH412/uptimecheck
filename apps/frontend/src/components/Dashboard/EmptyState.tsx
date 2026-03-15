@@ -1,9 +1,11 @@
+"use client";
+
 import { motion } from "framer-motion"
 import { Globe, Plus, Monitor, Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { AddWebsiteDialog } from "./AddWebsiteDialog"
-import { Website } from "./mockData"
+import { Website } from "./types"
 
 interface EmptyStateProps {
   onWebsiteAdded: (website: Website) => void

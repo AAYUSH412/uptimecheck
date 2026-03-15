@@ -10,7 +10,6 @@
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/body-parser": "^1.19.5",
     "@types/bun": "latest",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
@@ -20,11 +19,11 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "body-parser": "^1.20.3",
+    "common": "workspace:*",
     "cors": "^2.8.5",
     "db": "workspace:*",
-    "common": "workspace:*",
     "express": "^4.21.2",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "zod": "4.3.6"
   }
 }

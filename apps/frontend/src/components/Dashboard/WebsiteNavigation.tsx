@@ -1,3 +1,5 @@
+"use client";
+
 import { Globe, Home, Activity, Settings, BarChart3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
