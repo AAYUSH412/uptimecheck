@@ -5,7 +5,6 @@
 UptimeCheck is a monorepo containing everything needed to run a scalable uptime monitoring service. It separates the **Control Plane** (API/Frontend) from the **Data Plane** (Hub/Validators), allowing for a globally distributed network of monitoring nodes.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![CI](https://github.com/AAYUSH412/uptimecheck/actions/workflows/ci.yml/badge.svg)
 ![Runtime](https://img.shields.io/badge/runtime-bun-black?logo=bun)
 
 <div align="center">
