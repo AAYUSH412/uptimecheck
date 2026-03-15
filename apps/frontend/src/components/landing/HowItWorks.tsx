@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { Globe2, BellRing, Activity } from "lucide-react";
 
 const steps = [

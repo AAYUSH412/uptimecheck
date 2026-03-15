@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { Server, Database, Cloud, FileCode2, Command } from "lucide-react";
 
 export default function SocialProof() {

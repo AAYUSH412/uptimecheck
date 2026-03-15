@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { Globe2, BellRing, Activity, LayoutTemplate, LineChart } from "lucide-react";
 import { cn } from "@/lib/utils";
 

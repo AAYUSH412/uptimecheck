@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { SignUpButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import Link from "next/link";

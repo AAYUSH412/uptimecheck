@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle2, Terminal } from "lucide-react";
 import { SignUpButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
