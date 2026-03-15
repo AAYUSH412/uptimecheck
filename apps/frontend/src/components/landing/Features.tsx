@@ -39,7 +39,7 @@ const features = [
     visual: (
       <div className="absolute -bottom-4 -right-4 bg-[#111118] border border-white/10 rounded-xl p-4 w-48 shadow-xl opacity-50 group-hover:opacity-100 transition-opacity">
         <div className="text-xs font-mono text-[#8888A8]">POST /api/v1/health</div>
-        <div className="text-xs font-mono text-[#00C48C] mt-1">{"{"} "status": "ok" {"}"}</div>
+        <div className="text-xs font-mono text-[#00C48C] mt-1">{"{"} &quot;status&quot;: &quot;ok&quot; {"}"}</div>
       </div>
     ),
   },
@@ -87,7 +87,7 @@ export default function Features() {
             className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4"
           >
             Everything you need,<br/>
-            <span className="text-[#8888A8]">nothing you don't.</span>
+            <span className="text-[#8888A8]">nothing you don&apos;t.</span>
           </motion.h2>
         </div>
 

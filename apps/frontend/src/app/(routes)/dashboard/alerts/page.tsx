@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Bell, Mail, MessageSquare, Webhook, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 
@@ -119,7 +119,7 @@ export default function AlertsPage() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <h4 className="text-sm font-medium text-white">Weekly Reports</h4>
-                <p className="text-sm text-[#8888A8]">Get a weekly email summary of your monitors' uptime and performance.</p>
+                <p className="text-sm text-[#8888A8]">Get a weekly email summary of your monitors&apos; uptime and performance.</p>
               </div>
               <Switch defaultChecked />
             </div>

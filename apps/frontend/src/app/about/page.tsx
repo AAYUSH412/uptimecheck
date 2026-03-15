@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
+
 import { motion } from "framer-motion";
 import { Globe, Shield, Zap, Heart } from "lucide-react";
 import Footer from "@/components/landing/Footer";
@@ -60,10 +60,10 @@ export default function AboutPage() {
             <h2 className="text-3xl font-bold text-white mb-6">The Story</h2>
             <div className="space-y-6 text-[#8888A8] leading-relaxed">
               <p>
-                As developers, we've all been there: it's 3 AM, your phone blows up, and by the time you log in, your service has been quietly timing out for the last hour. Your current monitoring tool was pinging every 5 minutes from a single location that was routing incorrectly.
+                As developers, we&apos;ve all been there: it&apos;s 3 AM, your phone blows up, and by the time you log in, your service has been quietly timing out for the last hour. Your current monitoring tool was pinging every 5 minutes from a single location that was routing incorrectly.
               </p>
               <p>
-                We built UptimeCheck because we needed a tool that was <span className="text-white font-medium">ridiculously fast</span>, <span className="text-white font-medium">globally aware</span>, and didn't cost a fortune for basic features.
+                We built UptimeCheck because we needed a tool that was <span className="text-white font-medium">ridiculously fast</span>, <span className="text-white font-medium">globally aware</span>, and didn&apos;t cost a fortune for basic features.
               </p>
               <p>
                 Today, UptimeCheck is powered by an edge-first architecture with distributed validators that check your endpoints from multiple global regions every 60 seconds. If something blinks, you know before your users do.
