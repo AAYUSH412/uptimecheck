@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, AlertCircle, Clock, Activity } from "lucide-react";
+import { CheckCircle2, Clock, Activity } from "lucide-react";
 import Footer from "@/components/landing/Footer";
 
 export default function StatusPage() {

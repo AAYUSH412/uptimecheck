@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode, useRef } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef, useCallback } from "react";
 import { type ProcessedWebsite, type AggregatedTick } from "@/actions/website";
 
 interface DemoContextType {
@@ -14,7 +14,7 @@ interface DemoContextType {
 
 const DemoContext = createContext<DemoContextType | undefined>(undefined);
 
-const createMockTick = (date: Date, isUp: boolean, latency: number): AggregatedTick => ({
+const createMockTick = (date: Date, isUp: boolean): AggregatedTick => ({
   timestamp: date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
   status: isUp ? "up" : "down",
   windowStart: new Date(date.getTime() - 60000), // 1 min before
@@ -34,7 +34,7 @@ const generateHistory = (isReliable: boolean, baseLatency: number) => {
     const tickDate = new Date(now.getTime() - i * 60000);
     const isUp = isReliable || Math.random() > 0.15; // 15% chance of down for unreliable
     const latency = isUp ? baseLatency + Math.round(Math.random() * 20) : 0;
-    history.push(createMockTick(tickDate, isUp, latency));
+    history.push(createMockTick(tickDate, isUp));
   }
   return history;
 };
@@ -90,14 +90,14 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   ]);
   const timeoutRefs = useRef<number[]>([]);
 
-  const appendLog = (line: string, delay = 0) => {
+  const appendLog = useCallback((line: string, delay = 0) => {
     const timeoutId = window.setTimeout(() => {
       setTerminalLogs((prev) => [...prev, line].slice(-120));
     }, delay);
     timeoutRefs.current.push(timeoutId);
-  };
+  }, []);
 
-  const queueValidationLogs = (siteUrl: string, status: "up" | "down", latency: number, node: string) => {
+  const queueValidationLogs = useCallback((siteUrl: string, status: "up" | "down", latency: number, node: string) => {
     let host = siteUrl;
     try {
       host = new URL(siteUrl).hostname.replace(/^www\./, "");
@@ -113,7 +113,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     }
     appendLog(`[+20ms] [Validator: ${node}] Cryptographically signing result using Solana nacl...`, 20);
     appendLog(`[+28ms] [Hub] Signature verified. Dashboard state updated.`, 28);
-  };
+  }, [appendLog]);
 
   useEffect(() => {
     const nodes = ["US-East-1", "EU-Central-1", "AP-South-1"];
@@ -125,7 +125,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
           const baseLatency = isFlakySite ? 120 : site.url.includes("vercel") ? 12 : 25;
           const latency = isUp ? baseLatency + Math.round(Math.random() * 50) : 0;
 
-          const newTick = createMockTick(new Date(), isUp, latency);
+          const newTick = createMockTick(new Date(), isUp);
           const nextHistory = [...site.uptimeHistory, newTick].slice(-100);
           const nextStatus: ProcessedWebsite["status"] = isUp ? "up" : "down";
 
@@ -153,7 +153,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       }
       timeoutRefs.current = [];
     };
-  }, []);
+  }, [queueValidationLogs]);
 
   const refreshWebsites = async (silent = false) => {
     if (!silent) setIsLoading(true);

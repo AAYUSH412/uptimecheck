@@ -2,7 +2,6 @@
 
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
-import { Metadata } from 'next';
 import { DashboardSkeleton } from '@/components/Dashboard/DashboardSkeleton';
 
 // Dynamic import for better code splitting and performance

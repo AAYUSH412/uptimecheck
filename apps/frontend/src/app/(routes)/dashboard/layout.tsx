@@ -1,6 +1,8 @@
 import { UserButton } from "@clerk/nextjs";
 import { DashboardSidebar } from "@/components/Dashboard/DashboardSidebar";
 
+export const dynamic = "force-dynamic";
+
 export default function DashboardLayout({
   children,
 }: {

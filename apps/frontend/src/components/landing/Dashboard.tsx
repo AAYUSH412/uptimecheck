@@ -2,13 +2,11 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { 
-  Activity, 
-  TrendingUp, 
-  AlertCircle, 
-  CheckCircle, 
+import {
+  Activity,
+  TrendingUp,
+  AlertCircle,
   Globe,
-  Clock,
   BarChart3,
   Monitor,
   Zap,
