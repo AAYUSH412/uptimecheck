@@ -26,14 +26,13 @@ const createMockTick = (date: Date, isUp: boolean): AggregatedTick => ({
   uptime: isUp ? 100 : 0
 });
 
-const generateHistory = (isReliable: boolean, baseLatency: number) => {
+const generateHistory = (isReliable: boolean) => {
   const history: AggregatedTick[] = [];
   const now = new Date();
-  
+
   for (let i = 15; i >= 0; i--) {
     const tickDate = new Date(now.getTime() - i * 60000);
     const isUp = isReliable || Math.random() > 0.15; // 15% chance of down for unreliable
-    const latency = isUp ? baseLatency + Math.round(Math.random() * 20) : 0;
     history.push(createMockTick(tickDate, isUp));
   }
   return history;
@@ -55,7 +54,7 @@ const INITIAL_WEBSITES: ProcessedWebsite[] = [
     responseTime: "24ms",
     lastChecked: "Just now",
     latency: 24,
-    uptimeHistory: generateHistory(true, 20),
+    uptimeHistory: generateHistory(true),
   },
   {
     id: "demo-id-2",
@@ -66,7 +65,7 @@ const INITIAL_WEBSITES: ProcessedWebsite[] = [
     responseTime: "12ms",
     lastChecked: "Just now",
     latency: 12,
-    uptimeHistory: generateHistory(true, 10),
+    uptimeHistory: generateHistory(true),
   },
   {
     id: "demo-id-3",
@@ -77,7 +76,7 @@ const INITIAL_WEBSITES: ProcessedWebsite[] = [
     responseTime: "145ms",
     lastChecked: "Just now",
     latency: 145,
-    uptimeHistory: generateHistory(false, 130),
+    uptimeHistory: generateHistory(false),
   }
 ];
 
@@ -177,7 +176,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       responseTime: "45ms",
       lastChecked: "Just now",
       latency: 45,
-      uptimeHistory: generateHistory(true, 40),
+      uptimeHistory: generateHistory(true),
     };
     
     setWebsites(prev => [...prev, newSite]);
